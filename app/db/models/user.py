@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from app.db.base import Base  # Base class for all models, handles SQLAlchemy ORM setup
+from app.db.models.base import Base  # Base class for all models, handles SQLAlchemy ORM setup
 
 class User(Base):
     __tablename__ = "users"  # Name of the table in the database
