@@ -4,8 +4,11 @@ anyio==4.9.0
 bcrypt==4.3.0
 cffi==1.17.1
 click==8.2.1
+colorama==0.4.6
 cryptography==45.0.4
+dnspython==2.7.0
 ecdsa==0.19.1
+email_validator==2.2.0
 fastapi==0.115.13
 greenlet==3.2.3
 h11==0.16.0
@@ -18,6 +21,7 @@ pyasn1==0.6.1
 pycparser==2.22
 pydantic==2.11.7
 pydantic_core==2.33.2
+PyJWT==2.10.1
 python-dotenv==1.1.0
 python-jose==3.5.0
 rsa==4.9.1
