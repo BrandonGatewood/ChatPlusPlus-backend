@@ -2,9 +2,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 import jwt  # PyJWT library
 from fastapi import HTTPException, status
+import os
+from dotenv import load_dotenv
 
 # Replace with your secret key; keep it safe!
-SECRET_KEY = "your_secret_key_here"
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
