@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session, joinedload
 from app.db.models.chat import Chat
 from app.db.models.user import User 
@@ -35,4 +36,11 @@ def get_chat(db: Session, chat_id: int) -> Chat:
     return chat
     
 
-#def get_all_chat_titles(db: Session, user_id: int) -> 
+def get_all_chat_titles(db: Session, user_id: int) -> List[tuple[id, str]]:
+    chats = (
+        db.query(Chat.id, Chat.title)          # select only the columns you want
+        .filter(Chat.user_id == user_id)       # filter by the user's id
+        .order_by(Chat.created_at.desc())      # optional: newest chats first
+        .all()                                 # execute query and get list of tuples
+    )
+    return chats
