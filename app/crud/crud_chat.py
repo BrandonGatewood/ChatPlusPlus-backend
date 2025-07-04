@@ -7,7 +7,7 @@ from app.crud.crud_message import get_messages_for_chat
 def create_chat(db: Session, user_id: int, title: str) -> Chat:
     user = db.query.filter(User.id == user_id).first()
     if not user: 
-        raise ValueError("User with id {user_id} not found")
+        raise ValueError(f"User with id {user_id} not found")
     
     chat = Chat(user_id, title)
     db.add(chat)
@@ -18,7 +18,7 @@ def create_chat(db: Session, user_id: int, title: str) -> Chat:
 def delete_chat(db: Session, chat_id: int) -> None:
     chat = db.query(Chat).filter(Chat.id == chat_id).first()
     if not chat:
-        raise ValueError("Chat with id {chat_id} not found")
+        raise ValueError(f"Chat with id {chat_id} not found")
     
     db.delete(chat)
     db.commit()
@@ -32,7 +32,7 @@ def get_chat(db: Session, chat_id: int) -> Chat:
     )
 
     if not chat:
-        raise ValueError("Chat with id {chat_id} not found")
+        raise ValueError(f"Chat with id {chat_id} not found")
     return chat
     
 
