@@ -44,7 +44,7 @@ def add_upload_message_service(
     db: Session,
     chat_id: int,
     user_id: int,
-    file: UploadFile,
+    file: UploadFile
 ) -> MessageResponse:
     """
     Parses an uploaded resume (PDF or DOCX), saves it as a user message,
@@ -82,7 +82,7 @@ def edit_text_message_service(
         chat_id: int,
         user_id: int,
         message_id: int,
-        msg_in: MessageRequest,
+        msg_in: MessageRequest
 ) -> MessageResponse:
     """
     Edits an existing user message and generates a new bot response
