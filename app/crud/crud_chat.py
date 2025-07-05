@@ -1,3 +1,4 @@
+from uuid import UUID
 from typing import List
 from sqlalchemy.orm import Session, joinedload
 from app.db.models.chat import Chat
@@ -13,7 +14,7 @@ getting all chat titles, deleting a single chat, and checking ownership
 of a chat. 
 """
 
-def create_chat(db: Session, user_id: int, title: str) -> Chat:
+def create_chat(db: Session, user_id: UUID, title: str) -> Chat:
     """
     Add a new chat for the given user.
 
@@ -38,7 +39,7 @@ def create_chat(db: Session, user_id: int, title: str) -> Chat:
         db.refresh(chat)
     return chat
 
-def delete_chat(db: Session, chat_id: int) -> None:
+def delete_chat(db: Session, chat_id: UUID) -> None:
     """
     Delete the given chat.
 
@@ -58,7 +59,7 @@ def delete_chat(db: Session, chat_id: int) -> None:
     
         db.delete(chat)
 
-def get_chat(db: Session, chat_id: int) -> Chat:
+def get_chat(db: Session, chat_id: UUID) -> Chat:
     """
     Get the given chat.
 
@@ -83,7 +84,7 @@ def get_chat(db: Session, chat_id: int) -> Chat:
             raise ChatNotFoundError(f"Chat with id {chat_id} not found")
     return chat
     
-def get_all_chat_titles(db: Session, user_id: int) -> List[tuple[int, str]]:
+def get_all_chat_titles(db: Session, user_id: UUID) -> List[tuple[int, str]]:
     """
     Get the title of all chats owned by user.
 
@@ -103,7 +104,7 @@ def get_all_chat_titles(db: Session, user_id: int) -> List[tuple[int, str]]:
         )
     return chats
 
-def chat_ownership(db: Session, chat_id: int, user_id: int) -> bool:
+def chat_ownership(db: Session, chat_id: UUID, user_id: UUID) -> bool:
     """
     Check if user owns the chat.
 
