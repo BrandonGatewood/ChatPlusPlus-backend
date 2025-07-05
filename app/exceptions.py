@@ -9,3 +9,6 @@ class LLMError(Exception):
 
 class ExtensionsError(Exception):
     pass
+
+class BotError(Exception):
+    pass
