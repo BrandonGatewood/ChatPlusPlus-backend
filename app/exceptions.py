@@ -18,6 +18,9 @@ class NotFoundError(Exception):
     """Generic exception raised when a requested resource is not found."""
     pass
 
+class UserNotFoundError(Exception):
+    pass
+
 class ChatNotFoundError(Exception):
     """Raised when the specified chat does not exist in the database."""
     pass
