@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from app.db.models.base import Base  # Base class for all models, handles SQLAlchemy ORM setup
 
 """
-SQLAlchemy Message model definition, representing messages in chats.
+SQLAlchemy Message model definition, representing a chat with messages.
 """
 
 class Chat(Base):
