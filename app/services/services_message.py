@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from app.schemas.schema_message import MessageResponse, MessageRequest
 from app.crud.crud_chat import chat_ownership
 from app.crud.crud_message import add_message, edit_message
-from app.exceptions import AuthorizationError, ExtensionsError, BotError
+from app.exceptions import AuthorizationError, ChatNotFoundError, ExtensionsError, BotError, MessageNotFoundError, NotFoundError
 from app.utils.parsers import parse_docx_bytes, parse_pdf_bytes
 
-def add_text_message(
+def add_text_message_service(
         db: Session, 
         chat_id: int, 
         user_id: int,
@@ -23,6 +23,7 @@ def add_text_message(
 
     Raises:
         AuthorizationError: if the user is not authorized for the chat.
+        ChatNotFoundError: if chat not found.
 
     Returns:
         MessageResponse with the bot's reply.
@@ -32,11 +33,14 @@ def add_text_message(
         raise AuthorizationError("Not Authorized")
 
     # Save user's text message
-    user_message = add_message(db, chat_id, "user", msg_in.text)
+    try:
+        user_message = add_message(db, chat_id, "user", msg_in.text)
+    except ChatNotFoundError as e:
+        raise NotFoundError(f"Chat not found: {str(e)}") 
 
     return _get_bot_response(db, chat_id, user_message.text) 
 
-def add_upload_message(
+def add_upload_message_service(
     db: Session,
     chat_id: int,
     user_id: int,
@@ -71,9 +75,9 @@ def add_upload_message(
     else: 
         parsed_text = parse_docx_bytes(file_bytes)
     
-    return add_text_message(db, chat_id, user_id, parsed_text)
+    return add_text_message_service(db, chat_id, user_id, parsed_text)
 
-def edit_text_message(
+def edit_text_message_service(
         db: Session,
         chat_id: int,
         user_id: int,
@@ -91,6 +95,7 @@ def edit_text_message(
 
     Raises:
         AuthorizationError: if the user is not authorized for the chat.
+        MessageNotFoundError: if message not found.
 
     Returns:
         MessageResponse with the bot's reply.
@@ -100,7 +105,10 @@ def edit_text_message(
         raise AuthorizationError("Not Authorized") 
 
     # Save users edited Response
-    user_message = edit_message(db, message_id, msg_in)
+    try:
+        user_message = edit_message(db, message_id, msg_in.text)
+    except MessageNotFoundError as e:
+        raise NotFoundError(f"Message not found: {str(e)}")
 
     return _get_bot_response(db, chat_id, user_message.text)    
 
