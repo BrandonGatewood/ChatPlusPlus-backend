@@ -4,13 +4,14 @@ from app.db.models.message import Message
 from app.db.models.chat import Chat
 
 def add_message(db: Session, chat_id: int, sender: str, text: str) -> Message:
-    chat = db.query(Chat).filter(Chat.id == chat_id).first()
-    if not chat:
-        raise ValueError(f"Chat with id {chat_id} not found")
+    with db.begin():
+        chat = db.query(Chat).filter(Chat.id == chat_id).first()
+        if not chat:
+            raise ValueError(f"Chat with id {chat_id} not found")
 
-    message = Message(chat_id=chat_id, sender=sender, text=text)
-    db.add(message)
-    db.commit()
+        message = Message(chat_id=chat_id, sender=sender, text=text)
+        db.add(message)
+
     db.refresh(message)
     return message
 
