@@ -2,6 +2,7 @@ import datetime
 from sqlalchemy.orm import Session
 from app.db.models.message import Message
 from app.db.models.chat import Chat
+from app.exceptions import ChatNotFoundError, MessageNotFoundError 
 
 """
 CRUD operations for chat messages.
@@ -14,15 +15,21 @@ def add_message(db: Session, chat_id: int, sender: str, text: str) -> Message:
     """
     Add a new message to the given chat.
 
+    Args:
+        db: SQLAlchemy DB session.
+        chat_id: The chat's unique ID.
+        sender: sender of message.
+        text: the senders message text.
+
     Raises:
-        ValueError: if chat_id does not exist.
+        ChatNotFoundError: if chat_id does not exist.
     Returns:
         The newly created Message instance.
     """
     with db.begin():
         chat = db.query(Chat).filter(Chat.id == chat_id).first()
         if not chat:
-            raise ValueError(f"Chat with id {chat_id} not found")
+            raise ChatNotFoundError(f"Chat with id {chat_id} not found")
 
         message = Message(chat_id=chat_id, sender=sender, text=text)
 
@@ -34,8 +41,13 @@ def edit_message(db: Session, message_id: int, text: str) -> Message:
     """
     Edit the text of an existing message and delete the following messages in the given chat.
 
+    Args:
+        db: SQLAlchemy DB session.
+        message_id: The message's unique ID.
+        text: the updated message text.
+
     Raises:
-        ValueError: if message_id does not exist.
+        MessageNotFoundError: if message_id does not exist.
     Returns:
         The updated Message instance.
     """
@@ -43,12 +55,11 @@ def edit_message(db: Session, message_id: int, text: str) -> Message:
     with db.begin():
         message = db.query(Message).filter(Message.id == message_id).first()
         if not message:
-            raise ValueError(f"Message with id {message_id} not found")
+            raise MessageNotFoundError(f"Message with id {message_id} not found")
 
         message.text = text
 
         _delete_messages_after_edit(db, message.chat_id, message.created_at)
-        db.refresh(message) 
     return message
 
 def _delete_messages_after_edit(db: Session, chat_id: int, edited_message_created_at: datetime.datetime) -> None:
