@@ -76,8 +76,7 @@ def test_service_chat_create_chat_empty_files(mock_db_session, message_request_e
     """
     Unit test for successful execution of create_chat_service.
 
-    Empty files just str of users request
-    
+    User request text and no files
     """
 
     # Arrange
@@ -104,8 +103,7 @@ def test_service_chat_create_chat_one_pdf_file(mock_db_session, message_request_
     """
     Unit test for successful execution of create_chat_service.
 
-    str of users request and one file 
-    
+    User request text and one pdf file 
     """
 
     # Arrange
@@ -132,9 +130,8 @@ def test_service_chat_create_chat_one_pdf_file(mock_db_session, message_request_
 def test_service_chat_create_chat_one_docx_file(mock_db_session, message_request_one_docx_file, monkeypatch):
     """
     Unit test for successful execution of create_chat_service.
-
-    str of users request and one file 
     
+    User request text and one docx file 
     """
 
     # Arrange
@@ -162,8 +159,7 @@ def test_service_chat_create_chat_multiple_files(mock_db_session, message_reques
     """
     Unit test for successful execution of create_chat_service.
 
-    str of users request and one file 
-    
+    User request text and multiple docx/pdf files
     """
 
     # Arrange
