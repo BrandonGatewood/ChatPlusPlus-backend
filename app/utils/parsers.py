@@ -3,7 +3,7 @@ from pdfminer.high_level import extract_text as extract_pdf_text
 import docx
 from app.schemas.schema_message import MessageRequest
 
-def parse_pdf_bytes(file_bytes: bytes) -> MessageRequest:
+def parse_pdf_bytes(file_bytes: bytes) -> str:
     """Extract text from a PDF file given as bytes."""
     return extract_pdf_text(BytesIO(file_bytes))
 
