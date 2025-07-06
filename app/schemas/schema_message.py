@@ -1,3 +1,7 @@
+from datetime import datetime
+from uuid import UUID
+from typing import List, Optional
+from fastapi import UploadFile
 from pydantic import BaseModel
 
 class MessageRequest(BaseModel):
@@ -5,9 +9,30 @@ class MessageRequest(BaseModel):
     Schema for incoming user message requests.
     """
     text: str
+    files: Optional[List[UploadFile]]
+
+class EditMessageRequest(BaseModel):
+    """
+    Schema for incoming user edit message requests.
+    """
+    id: UUID
+    text: str
 
 class MessageResponse(BaseModel):
     """
     Schema for outgoing bot responses.
     """
     text: str
+
+class MessageInChat(BaseModel):
+    """
+    Schema representing a single message in a chat, used when displaying all messages 
+    within a chat.
+    """
+    id: UUID
+    sender: str
+    text: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
