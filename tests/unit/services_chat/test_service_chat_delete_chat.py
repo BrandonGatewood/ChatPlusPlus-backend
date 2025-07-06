@@ -14,7 +14,7 @@ def mock_db_session():
 
 def test_service_chat_delete_chat(mock_db_session, monkeypatch):
     """
-    Successful deletion of chat.
+    Unit test for successful execution of delete_chat_service.
     """
     user_id = uuid4()
     chat_id = uuid4()
@@ -28,6 +28,9 @@ def test_service_chat_delete_chat(mock_db_session, monkeypatch):
     delete_chat_service(mock_db_session, chat_id, user_id)
 
 def test_service_chat_delete_chat_unauthorized(mock_db_session, monkeypatch):
+    """
+    Unit test for delete_chat_service when user is not authorized.
+    """
     user_id = uuid4()
     chat_id = uuid4()
 
@@ -38,6 +41,9 @@ def test_service_chat_delete_chat_unauthorized(mock_db_session, monkeypatch):
         delete_chat_service(mock_db_session, chat_id, user_id)
 
 def test_service_chat_delete_chat_raise_chat_not_found(mock_db_session, monkeypatch):
+    """
+    Unit test for delete_chat_service when chat is not found.
+    """
     user_id = uuid4()
     chat_id = uuid4()
 

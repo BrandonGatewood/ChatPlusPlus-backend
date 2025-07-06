@@ -11,12 +11,16 @@ from app.services.services_chat import get_chat_service
 
 @pytest.fixture
 def mock_db_session():
+    """Returns a mock SQLAlchemy session with context manager support."""
     db = MagicMock()
     db.begin.return_value.__enter__.return_value = None
     db.begin.return_value.__exit__.return_value = None
     return db
 
 def test_service_chat_get_chat(mock_db_session, monkeypatch):
+    """
+    Unit test for successful execution of get_chat_service.
+    """
     user_id = uuid4()
     chat_id = uuid4()
 
@@ -36,6 +40,9 @@ def test_service_chat_get_chat(mock_db_session, monkeypatch):
     assert result.title == "Test Chat"
 
 def test_service_chat_get_chat_with_messages(mock_db_session, monkeypatch):
+    """
+    Unit test for successful execution of get_chat_service with chat that contains messages.
+    """
     user_id = uuid4()
     chat_id = uuid4()
 
@@ -75,6 +82,9 @@ def test_service_chat_get_chat_with_messages(mock_db_session, monkeypatch):
     assert result.messages[1].sender == "bot"
 
 def test_service_chat_get_chat_unauthorized(mock_db_session, monkeypatch):
+    """
+    Unit test for get_chat_service when user is not authorized.
+    """
     user_id = uuid4()
     chat_id = uuid4()
 
@@ -85,6 +95,9 @@ def test_service_chat_get_chat_unauthorized(mock_db_session, monkeypatch):
         get_chat_service(mock_db_session, chat_id, user_id)
 
 def test_service_chat_get_chat_not_found(mock_db_session, monkeypatch):
+    """
+    Unit test for get_chat_service when chat is not found.
+    """
     user_id = uuid4()
     chat_id = uuid4()
 

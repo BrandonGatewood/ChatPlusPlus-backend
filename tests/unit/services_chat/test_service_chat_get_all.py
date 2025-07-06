@@ -13,6 +13,9 @@ def mock_db_session():
     return db
 
 def test_service_chat_get_all_chat_returns_list(mock_db_session, monkeypatch):
+    """
+    Unit test for successful execution of get_all_chat_titles_service.
+    """
     user_id = uuid4()
 
     dummy_chat_titles = [
