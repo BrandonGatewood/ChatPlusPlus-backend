@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, func, Index
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text, func, Index
 from sqlalchemy.orm import relationship
 from app.db.models.base import Base  # Base class for all models, handles SQLAlchemy ORM setup
 
