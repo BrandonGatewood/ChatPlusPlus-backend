@@ -1,7 +1,6 @@
 from typing import List
 from uuid import UUID
 from sqlalchemy.orm import Session
-from app.db.models.chat import Chat
 from app.exceptions import AuthorizationError, UserNotFoundError, NotFoundError, ChatNotFoundError
 from app.schemas.schema_chat import ChatResponse, ChatTitle
 from app.schemas.schema_message import MessageRequest, MessageResponse
