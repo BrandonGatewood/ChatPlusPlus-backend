@@ -54,32 +54,34 @@ def add_message_service(
 
 def edit_text_message_service(
     db: Session,
-    chat_id: UUID,
     user_id: UUID,
+    chat_id: UUID,
     message_id: UUID,
-    msg_in: EditMessageRequest
+    edited_message_request: EditMessageRequest
 ) -> MessageResponse:
     """
-    Edit an existing user message, get new bot response.
+    Edit a message and update the chat with a new bot response.
 
     Args:
         db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
-        user_id: The user_id's unique ID.
-        msg_in: The user's edited message request.
+        user_id: The unique UUID for the user.
+        chat_id: The unique UUID for the chat.
+        message_id: The unique UUID for the message.
+        edited_message_request: The edited message request containing the new text.
+
     Raises: 
-        AuthorizationError: if user doesnt own chat. 
-        NotFoundError: if ChatNotFoundError was caught.
+        AuthorizationError: If user doesnt own chat. 
+        NotFoundError: If ChatNotFoundError was caught.
 
     Returns:
-        The MessageResponse object from the bot.
+        The message response object with the bot's response.
     """
     if not chat_ownership(db, chat_id, user_id):
         raise AuthorizationError("Not Authorized")
 
     try:
         with db.begin():
-            edit_message(db, message_id, msg_in.text)
+            edit_message(db, message_id, edited_message_request.text)
 
             prompt = build_prompt(db, chat_id)
             bot_response = call_bot(prompt)
