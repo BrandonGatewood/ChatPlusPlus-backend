@@ -15,31 +15,32 @@ Handles ownership checks and bot response generation.
 
 def add_message_service(
     db: Session,
-    chat_id: UUID,
     user_id: UUID,
-    msg_in: MessageRequest
+    chat_id: UUID,
+    message_request: MessageRequest
 ) -> MessageResponse:
     """
-    Add message(s) to a given chat.
+    Add a message and update the chat with a new bot response.
 
     Args:
         db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
-        user_id: The user_id's unique ID.
-        msg_in: The user's message request.
-    Raises: 
-        AuthorizationError: if user doesnt own chat. 
-        NotFoundError: if ChatNotFoundError was caught.
+        user_id: The unique UUID for the user.
+        chat_id: The unique UUID for the chat.
+        message_request: The message request containing the text.
+
+    Raises:
+        AuthorizationError: If user doesnt own chat.
+        NotFoundError: If ChatNotFoundError was caught.
 
     Returns:
-        The MessageResponse object from the bot.
+        The message response with the bot's response.
     """
     if not chat_ownership(db, chat_id, user_id):
         raise AuthorizationError("Not Authorized")
 
     try:
         with db.begin():
-            save_user_messages(db, chat_id, msg_in)
+            save_user_messages(db, chat_id, message_request)
 
             prompt = build_prompt(db, chat_id)
             bot_response = call_bot(prompt)
