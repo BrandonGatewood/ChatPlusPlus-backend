@@ -18,7 +18,7 @@ of a chat.
 def create_chat(
     db: Session,
     user_id: UUID,
-    title: str,
+    title: str
 ) -> Chat:
     """
     Add a new chat for the given user.
