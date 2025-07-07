@@ -90,8 +90,9 @@ def test_service_message_add_message_chat_not_found(mock_db_session, message_req
     user_id = uuid4()
     chat_id = uuid4()
 
-    # Arrange: patch chat_ownership to True
-    monkeypatch.setattr("app.services.services_message.chat_ownership", lambda db, chat_id, user_id: True)
+    # Arrange: patch chat_ownership with MagicMock returning False
+    mock_chat_ownership = MagicMock(return_value=True)
+    monkeypatch.setattr("app.services.services_message.chat_ownership", mock_chat_ownership) 
 
     # Arrange: patch save_user_messages to raise ChatNotFoundError
     mock_save_user_messages = MagicMock(side_effect=ChatNotFoundError("Chat does not exist"))
