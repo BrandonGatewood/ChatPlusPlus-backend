@@ -15,7 +15,6 @@ class EditMessageRequest(BaseModel):
     """
     Schema for incoming user edit message requests.
     """
-    id: UUID
     text: str
 
 class MessageResponse(BaseModel):
