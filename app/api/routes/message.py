@@ -28,31 +28,31 @@ def add_message_router(
 
     
 @router.post("/chats/{chat_id}/messages/{message_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
-def edit_text_message(
+def edit_text_message_router(
     chat_id: UUID,
     message_id: UUID,
-    message_request: EditMessageRequest,
+    edited_message_request: EditMessageRequest,
     db: Session = Depends(get_db),
     current_user: UserId = Depends(get_current_user),
 ) -> MessageResponse: 
     """
-    Edit an existing user message, generate a new bot response, and save both.
+    Edit a message and update the chat with a new bot response.
 
     Args:
         chat_id: The unique UUID for the chat.
         message_id: The unique UUID for the message.
-        message_request: The edited message request containing the new text.
+        edited_message_request: The edited message request containing the new text.
         db: SQLAlchemy DB session.
         current_user: The current authenticated user.
 
     Raises:
-        HTTPException: if AuthorizationError was caught.
+        HTTPException: If AuthorizationError was caught.
 
     Returns:
         The message response with the bot's response.
     """ 
     try:
-        return edit_text_message_service(db, chat_id, current_user.id, message_id, message_request)
+        return edit_text_message_service(db, current_user.id, chat_id, message_id, edited_message_request)
     except AuthorizationError as e:
         raise HTTPException(status_code=403, detail=str(e))
     except NotFoundError as e:
