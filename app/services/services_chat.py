@@ -8,10 +8,12 @@ from app.crud.crud_chat import chat_ownership, create_chat, delete_chat, get_all
 from app.crud.crud_message import add_message
 from app.services.services_shared import save_user_messages, build_prompt, call_bot
 
+
 """
 Chat service functions for creating, retrieving, listing, and deleting chats.
 Handles ownership checks and coordinates chat-related database operations.
 """
+
 
 def create_chat_service(
     db: Session,
@@ -48,7 +50,8 @@ def create_chat_service(
         raise NotFoundError(f"User not found: {str(e)}")
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
-    
+
+
 def delete_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> None:
     """
     Delete the given chat for user.
@@ -73,6 +76,7 @@ def delete_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> None:
             delete_chat(db, chat_id)
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
+
 
 def get_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> ChatResponse:
     """
@@ -101,6 +105,7 @@ def get_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> ChatResponse:
     
     return ChatResponse.model_validate(chat) 
 
+
 def get_all_chat_titles_service(db: Session, user_id: UUID) -> List[ChatTitle]:
     """
     Get all the chats owned by user.
@@ -115,4 +120,3 @@ def get_all_chat_titles_service(db: Session, user_id: UUID) -> List[ChatTitle]:
     with db.begin(): 
         chats = get_all_chat_titles(db, user_id)
     return chats
-
