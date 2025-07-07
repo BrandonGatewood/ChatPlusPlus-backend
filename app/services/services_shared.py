@@ -7,9 +7,11 @@ from app.crud.crud_chat import get_messages_for_chat
 from app.utils.parsers import parse_pdf_bytes, parse_docx_bytes
 from app.schemas.schema_message import MessageRequest, MessageResponse
 
+
 """
 Shared service functions for message handling:
 """
+
 
 def save_user_messages(db: Session, chat_id: UUID, msg_in: MessageRequest) -> None:
     """
@@ -29,6 +31,7 @@ def save_user_messages(db: Session, chat_id: UUID, msg_in: MessageRequest) -> No
             parsed_text = parse_file(file)
             add_message(db, chat_id, "user", parsed_text)
 
+
 def build_prompt(db: Session, chat_id: UUID) -> str:
     """
     Concatenate all messages in a chat into a single prompt string.
@@ -42,6 +45,7 @@ def build_prompt(db: Session, chat_id: UUID) -> str:
     """
     messages = get_messages_for_chat(db, chat_id)
     return "\n\n".join(msg.text for msg in messages)
+
 
 def parse_file(file: UploadFile) -> str:
     """
@@ -69,6 +73,7 @@ def parse_file(file: UploadFile) -> str:
         raise ExtensionsError(f"File {file.filename} is empty or could not be read.")
 
     return parse_pdf_bytes(file_bytes) if file_ext == "pdf" else parse_docx_bytes(file_bytes)
+
 
 def call_bot(prompt: str) -> MessageResponse:
     """

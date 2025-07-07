@@ -6,10 +6,12 @@ from app.crud.crud_chat import chat_ownership
 from app.crud.crud_message import add_message, edit_message
 from app.services.services_shared import save_user_messages, build_prompt, call_bot
 
+
 """
 Message service functions for adding and editing messages in chats.
 Handles ownership checks and bot response generation.
 """
+
 
 def add_message_service(
     db: Session,
@@ -48,6 +50,7 @@ def add_message_service(
 
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
+
 
 def edit_text_message_service(
     db: Session,
