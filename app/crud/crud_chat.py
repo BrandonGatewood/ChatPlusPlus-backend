@@ -25,11 +25,11 @@ def create_chat(
 
     Args:
         db: SQLAlchemy DB session.
-        user_id: The user's unique ID.
-        title: the title of the new chat.
+        user_id: The unique UUID for the user.
+        title: The title of the new chat.
 
     Raises:
-        UserNotFoundError: if user_id does not exist.
+        UserNotFoundError: If user does not exist.
 
     Returns:
         The newly created Chat instance.
@@ -52,7 +52,7 @@ def delete_chat(db: Session, chat_id: UUID) -> None:
 
     Args:
         db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
+        chat_id: The unique UUID for the chat.
 
     Raises:
         ChatNotFoundError: if chat_id does not exist.
@@ -73,7 +73,7 @@ def get_chat(db: Session, chat_id: UUID) -> Chat:
 
     Args:
         db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
+        chat_id: The unique UUID for the chat.
 
     Raises:
         ChatNotFoundError: if chat_id does not exist.
@@ -99,7 +99,7 @@ def get_all_chat_titles(db: Session, user_id: UUID) -> List[ChatTitle]:
 
     Args:
         db: SQLAlchemy DB session.
-        user_id: The user_id's unique ID.
+        user_id: The unique UUID for the user.
 
     Returns:
         The list of ChatTitle objects owned by user. 
@@ -119,7 +119,7 @@ def get_messages_for_chat(db: Session, chat_id: UUID) -> List[Message]:
 
     Args:
         db: SQLAlchemy DB session
-        chat_id: UUID of the chat
+        chat_id: The unique UUID for the chat.
 
     Returns:
         List of Message objects sorted by created_at ascending
@@ -139,11 +139,11 @@ def chat_ownership(db: Session, chat_id: UUID, user_id: UUID) -> bool:
 
     Args:
         db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
-        user_id: The user_id's unique ID.
+        chat_id: The unique UUID for the chat.
+        user_id: The unique UUID for the user.
 
     Raises: 
-        ChatNotFoundError: if chat_id does not exist.
+        ChatNotFoundError: If chat does not exist.
 
     Returns:
         True if user owns chat; False if user doesnt own chat. 
