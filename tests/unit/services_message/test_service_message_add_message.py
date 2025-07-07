@@ -46,7 +46,7 @@ def test_service_message_add_message(mock_db_session, message_request, monkeypat
     monkeypatch.setattr("app.services.services_message.add_message", mock_add_message)
 
     # Act
-    result = add_message_service(mock_db_session, chat_id, user_id, message_request)
+    result = add_message_service(mock_db_session, user_id, chat_id, message_request)
 
     # Assert: output correctness
     assert isinstance(result, MessageResponse)
@@ -75,7 +75,7 @@ def test_service_message_add_message_unauthorized(mock_db_session, message_reque
 
     # Act + Assert: service should raise AuthorizationError
     with pytest.raises(AuthorizationError, match="Not Authorized"):
-        add_message_service(mock_db_session, chat_id, user_id, message_request)
+        add_message_service(mock_db_session, user_id, chat_id, message_request)
 
     # Assert: ensure chat_ownership was called once with expected arguments
     mock_chat_ownership.assert_called_once_with(mock_db_session, chat_id, user_id) 
@@ -100,7 +100,7 @@ def test_service_message_add_message_chat_not_found(mock_db_session, message_req
 
     # Act + Assert: verify NotFoundError is raised with the expected message
     with pytest.raises(NotFoundError, match="Chat not found"):
-        add_message_service(mock_db_session, chat_id, user_id, message_request)
+        add_message_service(mock_db_session, user_id, chat_id, message_request)
 
     # Extra Assert: confirm create_chat was actually called once with expected args
     mock_save_user_messages.assert_called_once_with(mock_db_session, chat_id, message_request)  
