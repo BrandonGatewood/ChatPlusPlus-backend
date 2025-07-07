@@ -18,26 +18,26 @@ Handles ownership checks and coordinates chat-related database operations.
 def create_chat_service(
     db: Session,
     user_id: UUID,
-    msg_in: MessageRequest
+    message_request: MessageRequest
 ) -> MessageResponse:
     """
     Create a new chat with the user's initial message(s) and a bot response.
 
     Args:
         db: SQLAlchemy DB session.
-        user_id: The user_id's unique ID.
-        msg_in: The user's message request
+        user_id: The unique UUID for the user.
+        message_request: The message request containing the text.
 
     Raises: 
-        NotFoundError: if UserNotFoundError or ChatNotFoundError was caught.
+        NotFoundError: If UserNotFoundError or ChatNotFoundError was caught.
 
     Returns:
-        The MessageResponse object from the bot 
+        The message response with the bot's response.
     """
     try:
         with db.begin():
             chat = create_chat(db, user_id, "Chat Title")
-            save_user_messages(db, chat.id, msg_in)
+            save_user_messages(db, chat.id, message_request)
 
             prompt = build_prompt(db, chat.id)
             bot_response = call_bot(prompt)
@@ -52,18 +52,22 @@ def create_chat_service(
         raise NotFoundError(f"Chat not found: {str(e)}")
 
 
-def delete_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> None:
+def delete_chat_service(
+    db: Session,
+    chat_id: UUID,
+    user_id: UUID
+) -> None:
     """
     Delete the given chat for user.
 
     Args:
         db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
-        user_id: The user_id's unique ID.
+        chat_id: The unique UUID for the chat.
+        user_id: The unique UUID for the user.
 
     Raises: 
-        AuthorizationError: if user doesnt own chat. 
-        NotFoundError: if ChatNotFoundError was caught.
+        AuthorizationError: If user doesnt own chat. 
+        NotFoundError: If ChatNotFoundError was caught.
 
     Returns:
         None. 
@@ -84,12 +88,12 @@ def get_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> ChatResponse:
 
     Args:
         db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
-        user_id: The user_id's unique ID.
+        chat_id: The unique UUID for the chat.
+        user_id: The unique UUID for the user.
 
     Raises: 
-        AuthorizationError: if user doesnt own chat. 
-        NotFoundError: if ChatNotFoundError was caught.
+        AuthorizationError: If user doesnt own chat. 
+        NotFoundError: If ChatNotFoundError was caught.
 
     Returns:
         The Chat object.
@@ -112,7 +116,7 @@ def get_all_chat_titles_service(db: Session, user_id: UUID) -> List[ChatTitle]:
 
     Args:
         db: SQLAlchemy DB session.
-        user_id: The user_id's unique ID.
+        user_id: The unique UUID for the user.
 
     Returns:
         The list of all ChatTitles objects.
