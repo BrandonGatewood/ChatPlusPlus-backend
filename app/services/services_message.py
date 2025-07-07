@@ -56,6 +56,7 @@ def edit_text_message_service(
     db: Session,
     chat_id: UUID,
     user_id: UUID,
+    message_id: UUID,
     msg_in: EditMessageRequest
 ) -> MessageResponse:
     """
@@ -78,7 +79,7 @@ def edit_text_message_service(
 
     try:
         with db.begin():
-            edit_message(db, msg_in.id, msg_in.text)
+            edit_message(db, message_id, msg_in.text)
 
             prompt = build_prompt(db, chat_id)
             bot_response = call_bot(prompt)
