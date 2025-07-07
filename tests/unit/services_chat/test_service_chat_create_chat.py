@@ -78,19 +78,17 @@ def test_service_chat_create_chat_empty_files(mock_db_session, message_request_e
 
     User request text and no files
     """
-
     # Arrange
+    user_id = uuid4()
     dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Hi from bot")
+    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
 
     # Patch the dependent functions to avoid hitting actual DB/bot
     monkeypatch.setattr("app.services.services_chat.create_chat", lambda db, uid, title: dummy_chat)
-    monkeypatch.setattr("app.services.services_shared.save_user_messages", lambda db, chat_id, msg_in: None)
-    monkeypatch.setattr("app.services.services_shared.build_prompt", lambda db, chat_id: "Prompt for bot")
-    monkeypatch.setattr("app.services.services_shared.call_bot", lambda prompt: dummy_bot_response)
-    monkeypatch.setattr("app.services.services_message.add_message", lambda db, chat_id, sender, text: None)
-
-    user_id = uuid4()
+    monkeypatch.setattr("app.services.services_chat.save_user_messages", lambda db, chat_id, msg_in: None)
+    monkeypatch.setattr("app.services.services_chat.build_prompt", lambda db, chat_id: "Prompt for bot")
+    monkeypatch.setattr("app.services.services_chat.call_bot", lambda prompt: dummy_bot_response)
+    monkeypatch.setattr("app.services.services_chat.add_message", lambda db, chat_id, sender, text: None)
 
     # Act
     result = create_chat_service(mock_db_session, user_id, message_request_empty_files)
@@ -105,20 +103,17 @@ def test_service_chat_create_chat_one_pdf_file(mock_db_session, message_request_
 
     User request text and one pdf file 
     """
-
     # Arrange
+    user_id = uuid4()
     dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Hi from bot")
+    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
 
     # Patch the dependent functions to avoid hitting actual DB/bot
     monkeypatch.setattr("app.services.services_chat.create_chat", lambda db, uid, title: dummy_chat)
-    monkeypatch.setattr("app.services.services_shared.save_user_messages", lambda db, chat_id, msg_in: None)
-    monkeypatch.setattr("app.services.services_shared.build_prompt", lambda db, chat_id: "Prompt for bot")
-    monkeypatch.setattr("app.services.services_shared.call_bot", lambda prompt: dummy_bot_response)
-    monkeypatch.setattr("app.services.services_message.add_message", lambda db, chat_id, sender, text: None)
-    monkeypatch.setattr("app.services.services_shared.parse_file", lambda file_bytes: "Parsed dummy text")
-
-    user_id = uuid4()
+    monkeypatch.setattr("app.services.services_chat.save_user_messages", lambda db, chat_id, msg_in: None)
+    monkeypatch.setattr("app.services.services_chat.build_prompt", lambda db, chat_id: "Prompt for bot")
+    monkeypatch.setattr("app.services.services_chat.call_bot", lambda prompt: dummy_bot_response)
+    monkeypatch.setattr("app.services.services_chat.add_message", lambda db, chat_id, sender, text: None)
 
     # Act
     result = create_chat_service(mock_db_session, user_id, message_request_one_pdf_file)
@@ -133,20 +128,17 @@ def test_service_chat_create_chat_one_docx_file(mock_db_session, message_request
     
     User request text and one docx file 
     """
-
     # Arrange
+    user_id = uuid4()
     dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Hi from bot")
+    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
 
     # Patch the dependent functions to avoid hitting actual DB/bot
     monkeypatch.setattr("app.services.services_chat.create_chat", lambda db, uid, title: dummy_chat)
-    monkeypatch.setattr("app.services.services_shared.save_user_messages", lambda db, chat_id, msg_in: None)
-    monkeypatch.setattr("app.services.services_shared.build_prompt", lambda db, chat_id: "Prompt for bot")
-    monkeypatch.setattr("app.services.services_shared.call_bot", lambda prompt: dummy_bot_response)
-    monkeypatch.setattr("app.services.services_message.add_message", lambda db, chat_id, sender, text: None)
-    monkeypatch.setattr("app.services.services_shared.parse_file", lambda file_bytes: "Parsed dummy text")
-
-    user_id = uuid4()
+    monkeypatch.setattr("app.services.services_chat.save_user_messages", lambda db, chat_id, msg_in: None)
+    monkeypatch.setattr("app.services.services_chat.build_prompt", lambda db, chat_id: "Prompt for bot")
+    monkeypatch.setattr("app.services.services_chat.call_bot", lambda prompt: dummy_bot_response)
+    monkeypatch.setattr("app.services.services_chat.add_message", lambda db, chat_id, sender, text: None)
 
     # Act
     result = create_chat_service(mock_db_session, user_id, message_request_one_docx_file)
@@ -155,26 +147,26 @@ def test_service_chat_create_chat_one_docx_file(mock_db_session, message_request
     assert isinstance(result, MessageResponse)
     assert result.text == "Bot responded."
 
+
+
+
 def test_service_chat_create_chat_multiple_files(mock_db_session, message_request_multiple_files, monkeypatch):
     """
     Unit test for successful execution of create_chat_service.
 
     User request text and multiple docx/pdf files
     """
-
     # Arrange
+    user_id = uuid4()
     dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Hi from bot")
+    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
 
     # Patch the dependent functions to avoid hitting actual DB/bot
     monkeypatch.setattr("app.services.services_chat.create_chat", lambda db, uid, title: dummy_chat)
-    monkeypatch.setattr("app.services.services_shared.save_user_messages", lambda db, chat_id, msg_in: None)
-    monkeypatch.setattr("app.services.services_shared.build_prompt", lambda db, chat_id: "Prompt for bot")
-    monkeypatch.setattr("app.services.services_shared.call_bot", lambda prompt: dummy_bot_response)
-    monkeypatch.setattr("app.services.services_message.add_message", lambda db, chat_id, sender, text: None)
-    monkeypatch.setattr("app.services.services_shared.parse_file", lambda file_bytes: "Parsed dummy text")
-
-    user_id = uuid4()
+    monkeypatch.setattr("app.services.services_chat.save_user_messages", lambda db, chat_id, msg_in: None)
+    monkeypatch.setattr("app.services.services_chat.build_prompt", lambda db, chat_id: "Prompt for bot")
+    monkeypatch.setattr("app.services.services_chat.call_bot", lambda prompt: dummy_bot_response)
+    monkeypatch.setattr("app.services.services_chat.add_message", lambda db, chat_id, sender, text: None)
 
     # Act
     result = create_chat_service(mock_db_session, user_id, message_request_multiple_files)
@@ -183,37 +175,43 @@ def test_service_chat_create_chat_multiple_files(mock_db_session, message_reques
     assert isinstance(result, MessageResponse)
     assert result.text == "Bot responded."
 
+
+
+
+
 def test_service_chat_create_chat_raise_user_not_found(mock_db_session, message_request_multiple_files, monkeypatch):
     """
     Unit test for create_chat_service when user is not found.
     """
-
-    # Arrange: Patch create_chat to simulate user not found
-    monkeypatch.setattr(
-        "app.services.services_chat.create_chat",
-        lambda db, uid, title: (_ for _ in ()).throw(UserNotFoundError("User not found"))
-    )
-
+    # Arrange: generate a dummy user ID to simulate a real user
     user_id = uuid4()
 
-    # Act + Assert: Verify the expected exception is raised
+    # Arrange: patch create_chat to raise UserNotFoundError
+    mock_create_chat = MagicMock(side_effect=UserNotFoundError("User does not exist"))
+    monkeypatch.setattr("app.services.services_chat.create_chat", mock_create_chat)
+
+    # Act + Assert: verify NotFoundError is raised with the expected message
     with pytest.raises(NotFoundError, match="User not found"):
-        create_chat_service(mock_db_session, user_id, message_request_multiple_files) 
+        create_chat_service(mock_db_session, user_id, message_request_multiple_files)
+
+    # Extra Assert: confirm create_chat was actually called once with expected args
+    mock_create_chat.assert_called_once_with(mock_db_session, user_id, "Chat Title") 
 
 def test_service_chat_create_chat_raise_chat_not_found(mock_db_session, message_request_multiple_files, monkeypatch):
     """
-    Unit test for create_chat_service when chat is not found.
+    Unit test for create_chat_service: if add_message raises ChatNotFoundError,
+    the service should raise NotFoundError after completing previous steps. 
     """
-
-    # Arrange: Patch create_chat to simulate chat not found
-    monkeypatch.setattr(
-        "app.services.services_chat.create_chat",
-        lambda db, uid, title: (_ for _ in ()).throw(ChatNotFoundError("Chat not found"))
-    )
-
+    # Arrange: generate a dummy user ID to simulate a real user
     user_id = uuid4()
 
-    # Act + Assert: Verify the expected exception is raised
+    # Arrange: patch create_chat to raise ChatNotFoundError
+    mock_create_chat = MagicMock(side_effect=ChatNotFoundError("Chat does not exist"))
+    monkeypatch.setattr("app.services.services_chat.create_chat", mock_create_chat)
+
+    # Act + Assert: verify NotFoundError is raised with the expected message
     with pytest.raises(NotFoundError, match="Chat not found"):
         create_chat_service(mock_db_session, user_id, message_request_multiple_files)
- 
+
+    # Extra Assert: confirm create_chat was actually called once with expected args
+    mock_create_chat.assert_called_once_with(mock_db_session, user_id, "Chat Title")  
