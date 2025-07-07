@@ -18,9 +18,22 @@ def add_message_router(
     current_user: UserId  = Depends(get_current_user),
 ) -> MessageResponse:
     """
+    Add a message and update the chat with a new bot response.
+
+    Args:
+        chat_id: The unique UUID for the chat.
+        message_request: The message request containing the text.
+        db: SQLAlchemy DB session.
+        current_user: The current authenticated user.
+
+    Raises:
+        HTTPException: If AuthorizationError or NotFoundError was caught.
+
+    Returns:
+        The message response with the bot's response.
     """
     try:
-        return add_message_service(db, chat_id, current_user.id, message_request)
+        return add_message_service(db, current_user.id, chat_id, message_request)
     except AuthorizationError as e:
         raise HTTPException(status_code=403, detail=str(e))
     except NotFoundError as e:
