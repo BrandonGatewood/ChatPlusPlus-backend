@@ -63,6 +63,6 @@ def get_chat_router(
     """
     """
     try:
-        get_chat_service(db, chat_id, current_user.id)
+        return get_chat_service(db, chat_id, current_user.id)
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
