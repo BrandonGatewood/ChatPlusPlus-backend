@@ -1,5 +1,6 @@
+from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, File, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, status, Form, UploadFile
 from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
 from app.db.session import get_db
@@ -10,10 +11,11 @@ from app.exceptions import AuthorizationError, ExtensionsError, BotError, NotFou
 
 router = APIRouter()
 
-@router.post("/chats/{chat_id}/messages", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/chats/{chat_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 def add_message_router(
     chat_id: UUID,
-    message_request: MessageRequest,
+    message_request: str = Form(...),
+    files_request: Optional[List[UploadFile]] = File(None),
     db: Session = Depends(get_db),
     current_user: UserId  = Depends(get_current_user),
 ) -> MessageResponse:
@@ -33,14 +35,14 @@ def add_message_router(
         The message response with the bot's response.
     """
     try:
-        return add_message_service(db, current_user.id, chat_id, message_request)
+        return add_message_service(db, current_user.id, chat_id, MessageRequest(text=message_request, files=files_request))
     except AuthorizationError as e:
         raise HTTPException(status_code=403, detail=str(e))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
     
-@router.post("/chats/{chat_id}/messages/{message_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/chats/{chat_id}/{message_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 def edit_text_message_router(
     chat_id: UUID,
     message_id: UUID,
