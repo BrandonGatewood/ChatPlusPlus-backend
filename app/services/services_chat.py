@@ -35,14 +35,13 @@ def create_chat_service(
         The message response with the bot's response.
     """
     try:
-        with db.begin():
-            chat = create_chat(db, user_id, "Chat Title")
-            save_user_messages(db, chat.id, message_request)
+        chat = create_chat(db, user_id, "Chat Title")
+        save_user_messages(db, chat.id, message_request)
 
-            prompt = build_prompt(db, chat.id)
-            bot_response = call_bot(prompt)
+        prompt = build_prompt(db, chat.id)
+        bot_response = call_bot(prompt)
 
-            add_message(db, chat.id, "bot", bot_response.text)
+        add_message(db, chat.id, "bot", bot_response.text)
 
         return bot_response
 

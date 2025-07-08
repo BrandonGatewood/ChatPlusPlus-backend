@@ -40,6 +40,7 @@ def add_message(
     message = Message(chat_id=chat_id, sender=sender, text=text)
 
     db.add(message)
+    db.commit()
     db.refresh(message)
 
 

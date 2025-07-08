@@ -42,6 +42,7 @@ def create_chat(
     chat = Chat(user_id=user_id, title=title)
 
     db.add(chat)
+    db.commit()
     db.refresh(chat)
 
     return chat
