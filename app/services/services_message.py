@@ -35,17 +35,16 @@ def add_message_service(
     Returns:
         The message response with the bot's response.
     """
-    if not chat_ownership(db, chat_id, user_id):
-        raise AuthorizationError("Not Authorized")
-
     try:
-        with db.begin():
-            save_user_messages(db, chat_id, message_request)
+        if not chat_ownership(db, chat_id, user_id):
+            raise AuthorizationError("Not Authorized")
 
-            prompt = build_prompt(db, chat_id)
-            bot_response = call_bot(prompt)
+        save_user_messages(db, chat_id, message_request)
 
-            add_message(db, chat_id, "bot", bot_response.text)
+        prompt = build_prompt(db, chat_id)
+        bot_response = call_bot(prompt)
+
+        add_message(db, chat_id, "bot", bot_response.text)
 
         return bot_response
 
