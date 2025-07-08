@@ -1,7 +1,6 @@
 from io import BytesIO
 from pdfminer.high_level import extract_text as extract_pdf_text
 import docx
-from app.schemas.schema_message import MessageRequest
 
 def parse_pdf_bytes(file_bytes: bytes) -> str:
     """
