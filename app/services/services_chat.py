@@ -101,8 +101,7 @@ def get_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> ChatResponse:
         raise AuthorizationError("Not Authorized")
 
     try:
-        with db.begin():
-            chat = get_chat(db, chat_id)
+        chat = get_chat(db, chat_id)
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
     
@@ -120,6 +119,5 @@ def get_all_chat_titles_service(db: Session, user_id: UUID) -> List[ChatTitle]:
     Returns:
         The list of all ChatTitles objects.
     """
-    with db.begin(): 
-        chats = get_all_chat_titles(db, user_id)
+    chats = get_all_chat_titles(db, user_id)
     return chats
