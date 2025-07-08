@@ -76,17 +76,16 @@ def edit_text_message_service(
     Returns:
         The message response object with the bot's response.
     """
-    if not chat_ownership(db, chat_id, user_id):
-        raise AuthorizationError("Not Authorized")
-
     try:
-        with db.begin():
-            edit_message(db, message_id, edited_message_request.text)
+        if not chat_ownership(db, chat_id, user_id):
+            raise AuthorizationError("Not Authorized")
 
-            prompt = build_prompt(db, chat_id)
-            bot_response = call_bot(prompt)
+        edit_message(db, message_id, edited_message_request.text)
 
-            add_message(db, chat_id, "bot", bot_response.text)
+        prompt = build_prompt(db, chat_id)
+        bot_response = call_bot(prompt)
+
+        add_message(db, chat_id, "bot", bot_response.text)
 
         return bot_response
 
