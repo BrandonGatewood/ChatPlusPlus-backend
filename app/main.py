@@ -3,7 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db.models.base import Base
 from app.db.session import engine
 from app.api.routes import auth 
-from app.api.routes import user
+from app.api.routes import chat
+from app.api.routes import message
+
 from dotenv import load_dotenv
 import os
 
@@ -22,4 +24,5 @@ app.add_middleware(
 
 # Include auth router with prefix /auth
 app.include_router(auth.router, tags=["auth"])
-app.include_router(user.router, prefix="/user", tags=["user"])
+app.include_router(chat.router, tags=["chat"])
+app.include_router(message.router, prefix="/message", tags=["message"])
