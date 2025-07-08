@@ -7,7 +7,7 @@ from app.db.session import get_db
 from app.services.services_message import add_message_service, edit_text_message_service
 from app.schemas.schema_message import EditMessageRequest, MessageRequest, MessageResponse
 from app.schemas.user import UserId
-from app.exceptions import AuthorizationError, ExtensionsError, BotError, NotFoundError
+from app.exceptions import AuthorizationError, NotFoundError
 
 router = APIRouter()
 
