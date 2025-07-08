@@ -25,4 +25,4 @@ app.add_middleware(
 # Include auth router with prefix /auth
 app.include_router(auth.router, tags=["auth"])
 app.include_router(chat.router, tags=["chat"])
-app.include_router(message.router, prefix="/message", tags=["message"])
+app.include_router(message.router, tags=["message"])
