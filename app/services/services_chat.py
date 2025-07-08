@@ -71,10 +71,10 @@ def delete_chat_service(
     Returns:
         None. 
     """
-    if not chat_ownership(db, chat_id, user_id):
-        raise AuthorizationError("Not Authorized")
-
     try:
+        if not chat_ownership(db, chat_id, user_id):
+            raise AuthorizationError("Not Authorized")
+
         delete_chat(db, chat_id)
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
@@ -96,10 +96,10 @@ def get_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> ChatResponse:
     Returns:
         The Chat object.
     """
-    if not chat_ownership(db, chat_id, user_id):
-        raise AuthorizationError("Not Authorized")
-
     try:
+        if not chat_ownership(db, chat_id, user_id):
+            raise AuthorizationError("Not Authorized")
+
         chat = get_chat(db, chat_id)
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
