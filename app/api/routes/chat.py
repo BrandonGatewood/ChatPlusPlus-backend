@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
 from app.db.session import get_db
@@ -14,7 +14,8 @@ router = APIRouter()
 
 @router.post("/chats/", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 def create_chat_router(
-    msg_request: MessageRequest,
+    message_request: str = Form(...),
+    files_request: Optional[List[UploadFile]] = File(None),
     db: Session = Depends(get_db),
     current_user: UserId = Depends(get_current_user)
 ) -> MessageResponse: 
@@ -22,7 +23,7 @@ def create_chat_router(
     Create a new chat with the user's initial message(s).
     """
     try:
-        return create_chat_service(db, current_user.id, msg_request)
+        return create_chat_service(db, current_user.id, MessageRequest(text=message_request, files=files_request))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
