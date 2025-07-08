@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
 # Schema for user creation (register)
@@ -12,4 +13,4 @@ class UserLogin(BaseModel):
     password: str
 
 class UserId(BaseModel):
-    id: int
+    id: UUID 
