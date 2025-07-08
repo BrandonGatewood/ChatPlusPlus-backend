@@ -67,6 +67,7 @@ def delete_chat(db: Session, chat_id: UUID) -> None:
         raise ChatNotFoundError(f"Chat with id {chat_id} not found")
 
     db.delete(chat)
+    db.commit()
 
 def get_chat(db: Session, chat_id: UUID) -> Chat:
     """
