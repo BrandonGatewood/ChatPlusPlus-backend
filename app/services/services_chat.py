@@ -75,8 +75,7 @@ def delete_chat_service(
         raise AuthorizationError("Not Authorized")
 
     try:
-        with db.begin():
-            delete_chat(db, chat_id)
+        delete_chat(db, chat_id)
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
 
