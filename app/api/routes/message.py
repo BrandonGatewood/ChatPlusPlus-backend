@@ -26,6 +26,7 @@ def add_message_router(
     Args:
         chat_id: The unique UUID for the chat.
         message_request: The message request containing the text.
+        file_requests: The File requests containing the List[UploadFile]
         db: SQLAlchemy DB session.
         current_user: The current authenticated user.
 
