@@ -23,6 +23,18 @@ def create_chat_router(
 ) -> MessageResponse: 
     """
     Create a new chat with the user's initial message(s).
+    
+    Args:
+        message_request: The message request containing the text.
+        file_requests: The File requests containing the List[UploadFile]
+        db: SQLAlchemy DB session.
+        current_user: The current authenticated user.
+
+    Raises:
+        HTTPException: If NotFoundError was caught.
+
+    Returns:
+        The message response with the bot's response.
     """
     try:
         return create_chat_service(db, current_user.id, MessageRequest(text=message_request, files=files_request))
@@ -38,6 +50,17 @@ def delete_chat_router(
 ) -> None:
     """
     Delete a given chat
+
+    Args:
+        chat_id: The unique UUID for the chat.
+        db: SQLAlchemy DB session.
+        current_user: The current authenticated user.
+
+    Raises:
+        HTTPException: If AuthorizationError or NotFoundError was caught.
+
+    Returns:
+        None.
     """
     try:
         delete_chat_service(db, chat_id, current_user.id)
@@ -53,6 +76,14 @@ def get_chats_router(
     current_user: UserId = Depends(get_current_user)
 ) -> List[ChatTitle]:
     """
+    Get all chats with id and title.
+
+    Args:
+        db: SQLAlchemy DB session.
+        current_user: The current authenticated user.
+
+    Returns:
+        The List[ChatTitle] owned by the user.
     """
     return get_chats_service(db, current_user.id)
 
@@ -64,6 +95,16 @@ def get_chat_router(
     current_user: UserId = Depends(get_current_user)
 ) -> ChatResponse:
     """
+    Args:
+        chat_id: The unique UUID for the chat.
+        db: SQLAlchemy DB session.
+        current_user: The current authenticated user.
+
+    Raises:
+        HTTPException: If NotFoundError was caught.
+
+    Returns:
+        The ChatResponse instance.
     """
     try:
         return get_chat_service(db, chat_id, current_user.id)
