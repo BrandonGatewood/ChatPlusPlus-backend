@@ -10,10 +10,24 @@ from app.core.jwt import SECRET_KEY, ALGORITHM
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-# -------------------------------
-# Get current user from token
-# -------------------------------
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> UserId:
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> UserId:
+    """
+    extract the user's id from the Jason Web Token.
+
+    Args:
+        token: The Jason Web Token.
+        db: SQLAlchemy DB session.
+
+    Raises:
+        HTTPException: If Jason Web Token is invalid.
+    
+    Returns:
+        The user's UUID.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
