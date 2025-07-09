@@ -2,48 +2,36 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.schemas.user import UserCreate, UserLogin 
+from app.exceptions import AuthorizationError, ValidationError
+from app.schemas.schema_user import UserCreate, UserLogin 
 from app.schemas.token import Token
-from app.db.models.user import User
-from app.core.security import hash_password, verify_password
-from app.core.jwt import create_access_token
+from app.services.services_auth import login_service, register_service
 
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-# ---------------------------
-# Register Route
-# ---------------------------
-@router.post("/register", response_model=Token)
-def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    # Check if user already exists
-    existing_user = db.query(User).filter(User.email == user_in.email).first()
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
-
-    # Hash password and create new user
-    hashed_pw = hash_password(user_in.password)
-    new_user = User(email=user_in.email, hashed_password=hashed_pw)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    # Return JWT so user is auto-logged-in
-    access_token = create_access_token({"sub": str(new_user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+def register(
+    user_request: UserCreate, 
+    db: Session = Depends(get_db)
+) -> Token:
+    """
+    """
+    try:
+        return register_service(db, user_request)
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e)) 
 
 
-# ---------------------------
-# Login Route
-# ---------------------------
-@router.post("/login", response_model=Token)
-def login(user_in: UserLogin, db: Session = Depends(get_db)):
-    # Find user by email
-    user = db.query(User).filter(User.email == user_in.email).first()
-    if not user or not verify_password(user_in.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
-
-    # Create and return access token
-    access_token = create_access_token({"sub": str(user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+@router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
+def login(
+    user_request: UserLogin,
+    db: Session = Depends(get_db)
+) -> Token:
+    """
+    """
+    try:
+        return login_service(db, user_request)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, details=str(e))
