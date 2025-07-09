@@ -7,7 +7,7 @@ from app.db.session import get_db
 from app.exceptions import AuthorizationError, NotFoundError
 from app.schemas.schema_chat import ChatResponse, ChatTitle
 from app.schemas.schema_message import MessageRequest, MessageResponse
-from app.schemas.user import UserId
+from app.schemas.schema_user import UserId
 from app.services.services_chat import create_chat_service, delete_chat_service, get_chat_service
 from app.services.services_chat import get_all_chat_titles_service as get_chats_service
 router = APIRouter()
