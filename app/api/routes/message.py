@@ -11,6 +11,7 @@ from app.exceptions import AuthorizationError, NotFoundError
 
 router = APIRouter()
 
+
 @router.post("/chats/{chat_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 def add_message_router(
     chat_id: UUID,

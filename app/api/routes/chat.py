@@ -10,7 +10,9 @@ from app.schemas.schema_message import MessageRequest, MessageResponse
 from app.schemas.schema_user import UserId
 from app.services.services_chat import create_chat_service, delete_chat_service, get_chat_service
 from app.services.services_chat import get_all_chat_titles_service as get_chats_service
+
 router = APIRouter()
+
 
 @router.post("/chats/", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 def create_chat_router(

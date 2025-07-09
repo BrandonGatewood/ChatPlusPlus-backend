@@ -4,9 +4,11 @@ from sqlalchemy import Column, DateTime, ForeignKey, String, Text, func, Index
 from sqlalchemy.orm import relationship
 from app.db.models.base import Base  # Base class for all models, handles SQLAlchemy ORM setup
 
+
 """
 SQLAlchemy Message model definition, representing messages in chats.
 """
+
 
 class Message(Base):
     __tablename__ = "messages"  # Name of the table in the database

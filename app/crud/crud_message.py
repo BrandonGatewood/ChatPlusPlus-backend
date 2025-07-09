@@ -5,12 +5,14 @@ from app.db.models.message import Message
 from app.db.models.chat import Chat
 from app.exceptions import ChatNotFoundError, MessageNotFoundError 
 
+
 """
 CRUD operations for chat messages.
 
 Includes adding new messages, editing messages, and deleting future messages
 after an edit to maintain chat consistency.
 """
+
 
 def add_message(
         db: Session,

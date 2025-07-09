@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
-
 from app.schemas.schema_message import MessageInChat
+
 
 class ChatTitle(BaseModel):
     """
@@ -11,6 +11,7 @@ class ChatTitle(BaseModel):
     """
     id: UUID 
     title: str
+
 
 class ChatResponse(BaseModel):
     """

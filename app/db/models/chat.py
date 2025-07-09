@@ -4,9 +4,11 @@ from sqlalchemy import Column, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import relationship
 from app.db.models.base import Base  # Base class for all models, handles SQLAlchemy ORM setup
 
+
 """
 SQLAlchemy Chat model definition, representing a chat with messages.
 """
+
 
 class Chat(Base):
     __tablename__ = "chats"

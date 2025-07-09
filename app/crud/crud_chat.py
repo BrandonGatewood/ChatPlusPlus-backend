@@ -7,6 +7,7 @@ from app.db.models.user import User
 from app.exceptions import UserNotFoundError, ChatNotFoundError
 from app.schemas.schema_chat import ChatTitle
 
+
 """
 CRUD operations for chat. 
 
@@ -14,6 +15,7 @@ Includes adding a new chat, getting a single chat with all messages,
 getting all chat titles, deleting a single chat, and checking ownership
 of a chat. 
 """
+
 
 def create_chat(
     db: Session,
@@ -47,6 +49,7 @@ def create_chat(
 
     return chat
 
+
 def delete_chat(db: Session, chat_id: UUID) -> None:
     """
     Delete the given chat.
@@ -68,6 +71,7 @@ def delete_chat(db: Session, chat_id: UUID) -> None:
 
     db.delete(chat)
     db.commit()
+
 
 def get_chat(db: Session, chat_id: UUID) -> Chat:
     """
@@ -94,7 +98,8 @@ def get_chat(db: Session, chat_id: UUID) -> Chat:
         raise ChatNotFoundError(f"Chat with id {chat_id} not found")
 
     return chat
-    
+
+
 def get_all_chat_titles(db: Session, user_id: UUID) -> List[ChatTitle]:
     """
     Get the title of all chats owned by user.
@@ -115,6 +120,7 @@ def get_all_chat_titles(db: Session, user_id: UUID) -> List[ChatTitle]:
 
     return [ChatTitle(id=chat_id, title=title) for chat_id, title in chats]
 
+
 def get_messages_for_chat(db: Session, chat_id: UUID) -> List[Message]:
     """
     Fetch all messages belonging to a specific chat, ordered by creation time.
@@ -134,6 +140,7 @@ def get_messages_for_chat(db: Session, chat_id: UUID) -> List[Message]:
     )
 
     return messages
+
 
 def chat_ownership(db: Session, chat_id: UUID, user_id: UUID) -> bool:
     """

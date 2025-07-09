@@ -4,6 +4,7 @@ from typing import List, Optional
 from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict
 
+
 class MessageRequest(BaseModel):
     """
     Schema for incoming user message requests.
@@ -11,17 +12,20 @@ class MessageRequest(BaseModel):
     text: str
     files: Optional[List[UploadFile]] = None
 
+
 class EditMessageRequest(BaseModel):
     """
     Schema for incoming user edit message requests.
     """
     text: str
 
+
 class MessageResponse(BaseModel):
     """
     Schema for outgoing bot responses.
     """
     text: str
+
 
 class MessageInChat(BaseModel):
     """
