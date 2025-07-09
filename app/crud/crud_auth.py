@@ -82,4 +82,3 @@ def check_email(
     return db.query(
         db.query(User).filter(User.email == email).exists()
     ).scalar() 
-
