@@ -1,16 +1,22 @@
 from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
-# Schema for user creation (register)
 class UserCreate(BaseModel):
-    email: EmailStr  # validates email format
-    password: str    # plain password input
+    """
+    Schema for incoming user create requests.
+    """
+    email: EmailStr  
+    password: str    
 
-
-# Schema for user login
 class UserLogin(BaseModel):
+    """
+    Schema for incoming user login requests.
+    """
     email: EmailStr
     password: str
 
 class UserId(BaseModel):
+    """
+    Schema for outgoing user id.
+    """
     id: UUID 
