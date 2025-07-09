@@ -4,6 +4,12 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.db.models.base import Base
 
+
+"""
+SQLAlchemy User model definition, representing users.
+"""
+
+
 class User(Base):
     __tablename__ = "users"
 
