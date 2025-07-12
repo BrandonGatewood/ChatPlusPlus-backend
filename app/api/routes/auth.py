@@ -57,4 +57,4 @@ def login(
     try:
         return login_service(db, user_request)
     except AuthorizationError as e:
-        raise HTTPException(status_code=401, details=str(e))
+        raise HTTPException(status_code=401, detail=str(e))
