@@ -1,10 +1,11 @@
+from typing import List
 from uuid import UUID
 from sqlalchemy.orm import Session
 from app.exceptions import AuthorizationError, NotFoundError, MessageNotFoundError, ChatNotFoundError
 from app.schemas.schema_message import MessageRequest, EditMessageRequest, MessageResponse
 from app.crud.crud_chat import chat_ownership
-from app.crud.crud_message import add_message, edit_message
-from app.services.services_shared import save_user_messages, build_prompt, call_bot
+from app.crud.crud_message import edit_message
+from app.services.services_shared import save_user_messages
 
 
 """
@@ -18,9 +19,9 @@ def add_message_service(
     user_id: UUID,
     chat_id: UUID,
     message_request: MessageRequest
-) -> MessageResponse:
+) -> List[MessageResponse]:
     """
-    Add a message and update the chat with a new bot response.
+    Add a message and update the chat.
 
     Args:
         db: SQLAlchemy DB session.
@@ -33,20 +34,15 @@ def add_message_service(
         NotFoundError: If ChatNotFoundError was caught.
 
     Returns:
-        The message response with the bot's response.
+        The list of MessageResponse instance containing the id, sender, and text.
     """
     try:
         if not chat_ownership(db, chat_id, user_id):
             raise AuthorizationError("Not Authorized")
 
-        save_user_messages(db, chat_id, message_request)
+        message_responses = save_user_messages(db, chat_id, message_request)
 
-        prompt = build_prompt(db, chat_id)
-        bot_response = call_bot(prompt)
-
-        add_message(db, chat_id, "bot", bot_response.text)
-
-        return bot_response
+        return message_responses
 
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
@@ -58,9 +54,9 @@ def edit_text_message_service(
     chat_id: UUID,
     message_id: UUID,
     edited_message_request: EditMessageRequest
-) -> MessageResponse:
+) -> None:
     """
-    Edit a message and update the chat with a new bot response.
+    Edit a message and update the chat.
 
     Args:
         db: SQLAlchemy DB session.
@@ -71,23 +67,16 @@ def edit_text_message_service(
 
     Raises: 
         AuthorizationError: If user doesnt own chat. 
-        NotFoundError: If ChatNotFoundError was caught.
+        NotFoundError: If MessageNotFoundError or ChatNotFoundError was caught.
 
     Returns:
-        The message response object with the bot's response.
+        None.
     """
     try:
         if not chat_ownership(db, chat_id, user_id):
             raise AuthorizationError("Not Authorized")
 
         edit_message(db, message_id, edited_message_request.text)
-
-        prompt = build_prompt(db, chat_id)
-        bot_response = call_bot(prompt)
-
-        add_message(db, chat_id, "bot", bot_response.text)
-
-        return bot_response
 
     except MessageNotFoundError as e:
         raise NotFoundError(f"Message not found: {str(e)}")

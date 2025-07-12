@@ -3,7 +3,8 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from app.db.models.message import Message
 from app.db.models.chat import Chat
-from app.exceptions import ChatNotFoundError, MessageNotFoundError 
+from app.exceptions import ChatNotFoundError, MessageNotFoundError
+from app.schemas.schema_message import MessageResponse 
 
 
 """
@@ -15,11 +16,11 @@ after an edit to maintain chat consistency.
 
 
 def add_message(
-        db: Session,
-        chat_id: UUID,
-        sender: str,
-        text: str
-) -> None:
+    db: Session,
+    chat_id: UUID,
+    sender: str,
+    text: str
+) -> MessageResponse:
     """
     Add a new message to the chat.
 
@@ -33,7 +34,7 @@ def add_message(
         ChatNotFoundError: If chat does not exist.
 
     Returns:
-        None.
+        The MessageResponse instance containing the id, sender, and text.
     """
     chat = db.query(Chat).filter(Chat.id == chat_id).one_or_none()
     if not chat:
@@ -45,8 +46,14 @@ def add_message(
     db.commit()
     db.refresh(message)
 
+    return MessageResponse.model_validate(message)
 
-def edit_message(db: Session, message_id: UUID, text: str) -> None: 
+
+def edit_message(
+    db: Session,
+    message_id: UUID,
+    text: str
+) -> None: 
     """
     Edit the text of an existing message and delete the following messages in the given chat.
 
@@ -69,8 +76,14 @@ def edit_message(db: Session, message_id: UUID, text: str) -> None:
 
     _delete_messages_after_edit(db, message.chat_id, message.created_at)
 
+    db.commit()
 
-def _delete_messages_after_edit(db: Session, chat_id: UUID, edited_message_created_at: datetime.datetime) -> None:
+
+def _delete_messages_after_edit(
+    db: Session,
+    chat_id: UUID,
+    edited_message_created_at: datetime.datetime
+) -> None:
     """
     Delete all messages that were after the edited message.
 

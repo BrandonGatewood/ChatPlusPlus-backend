@@ -12,16 +12,16 @@ from app.exceptions import AuthorizationError, NotFoundError
 router = APIRouter()
 
 
-@router.post("/chats/{chat_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/chats/{chat_id}", response_model=List[MessageResponse], status_code=status.HTTP_201_CREATED)
 def add_message_router(
     chat_id: UUID,
     message_request: str = Form(...),
     files_request: Optional[List[UploadFile]] = File(None),
     db: Session = Depends(get_db),
     current_user: UserId  = Depends(get_current_user),
-) -> MessageResponse:
+) -> List[MessageResponse]:
     """
-    Add a message and update the chat with a new bot response.
+    Add a message and update the chat.
 
     Args:
         chat_id: The unique UUID for the chat.
@@ -34,7 +34,7 @@ def add_message_router(
         HTTPException: If AuthorizationError or NotFoundError was caught.
 
     Returns:
-        The message response with the bot's response.
+        The list of MessageResponse instance containing the id, sender, and text.
     """
     try:
         return add_message_service(db, current_user.id, chat_id, MessageRequest(text=message_request, files=files_request))
@@ -44,16 +44,16 @@ def add_message_router(
         raise HTTPException(status_code=404, detail=str(e))
 
     
-@router.post("/chats/{chat_id}/{message_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/chats/{chat_id}/{message_id}", status_code=status.HTTP_204_NO_CONTENT)
 def edit_text_message_router(
     chat_id: UUID,
     message_id: UUID,
     edited_message_request: EditMessageRequest,
     db: Session = Depends(get_db),
     current_user: UserId = Depends(get_current_user),
-) -> MessageResponse: 
+) -> None: 
     """
-    Edit a message and update the chat with a new bot response.
+    Edit a message and update the chat.
 
     Args:
         chat_id: The unique UUID for the chat.
@@ -63,13 +63,13 @@ def edit_text_message_router(
         current_user: The current authenticated user.
 
     Raises:
-        HTTPException: If AuthorizationError was caught.
-
+        HTTPException: If AuthorizationError or NotFoundError was caught.
+    
     Returns:
-        The message response with the bot's response.
+        None.
     """ 
     try:
-        return edit_text_message_service(db, current_user.id, chat_id, message_id, edited_message_request)
+        edit_text_message_service(db, current_user.id, chat_id, message_id, edited_message_request)
     except AuthorizationError as e:
         raise HTTPException(status_code=403, detail=str(e))
     except NotFoundError as e:

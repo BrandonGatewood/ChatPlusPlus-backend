@@ -1,4 +1,3 @@
-from datetime import datetime
 from uuid import UUID
 from typing import List, Optional
 from fastapi import UploadFile
@@ -22,18 +21,10 @@ class EditMessageRequest(BaseModel):
 
 class MessageResponse(BaseModel):
     """
-    Schema for outgoing bot responses.
-    """
-    text: str
-
-
-class MessageInChat(BaseModel):
-    """
     Schema representing a single message in a chat, used when displaying all messages 
     within a chat.
     """
     id: UUID
     sender: str
     text: str
-    created_at: datetime
     model_config = ConfigDict(from_attributes=True)
