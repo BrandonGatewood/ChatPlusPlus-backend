@@ -65,7 +65,7 @@ def delete_chat_router(
     try:
         delete_chat_service(db, chat_id, current_user.id)
     except AuthorizationError as e:
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=401, detail=str(e))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
 

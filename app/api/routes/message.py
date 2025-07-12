@@ -39,7 +39,7 @@ def add_message_router(
     try:
         return add_message_service(db, current_user.id, chat_id, MessageRequest(text=message_request, files=files_request))
     except AuthorizationError as e:
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=401, detail=str(e))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -71,6 +71,6 @@ def edit_text_message_router(
     try:
         edit_text_message_service(db, current_user.id, chat_id, message_id, edited_message_request)
     except AuthorizationError as e:
-        raise HTTPException(status_code=403, detail=str(e))
+        raise HTTPException(status_code=401, detail=str(e))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
