@@ -10,13 +10,16 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+url = os.getenv("FRONTEND_URL")
+if url.endswith("/"):
+    url = url[:-1]
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("FRONTEND_URL")],  # React dev server
+    allow_origins=[url],  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
