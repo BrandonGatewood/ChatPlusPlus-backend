@@ -1,3 +1,4 @@
+from typing import List
 from unittest.mock import MagicMock
 from uuid import uuid4
 import pytest
@@ -28,36 +29,31 @@ def test_service_message_add_message(mock_db_session, message_request, monkeypat
     # Arrange: generate a to simulate a real data 
     user_id = uuid4()
     chat_id = uuid4()
-    dummy_bot_response = MessageResponse(
-        id=1, chat_id=chat_id, sender="bot", text="Bot responded."
-    )
+    message_id = uuid4()
+    dummy_message_responses = [
+        MessageResponse(
+            id=message_id, sender="user", text="new message"
+        )
+    ]
 
     # Arrange: patch dependencies with MagicMock so we can assert calls
     mock_chat_ownership = MagicMock(return_value=True)
-    mock_save_user_messages = MagicMock()
-    mock_build_prompt = MagicMock(return_value="Prompt text")
-    mock_call_bot = MagicMock(return_value=dummy_bot_response)
-    mock_add_message = MagicMock()
+    mock_save_user_messages = MagicMock(return_value=dummy_message_responses)
 
     monkeypatch.setattr("app.services.services_message.chat_ownership", mock_chat_ownership)
     monkeypatch.setattr("app.services.services_message.save_user_messages", mock_save_user_messages)
-    monkeypatch.setattr("app.services.services_message.build_prompt", mock_build_prompt)
-    monkeypatch.setattr("app.services.services_message.call_bot", mock_call_bot)
-    monkeypatch.setattr("app.services.services_message.add_message", mock_add_message)
 
     # Act
     result = add_message_service(mock_db_session, user_id, chat_id, message_request)
 
     # Assert: output correctness
-    assert isinstance(result, MessageResponse)
-    assert result.text == "Bot responded."
+    assert isinstance(result, list)
+    assert len(result) > 0
+    assert isinstance(result[0], MessageResponse)
 
     # Assert: all expected calls happened once with expected args
     mock_chat_ownership.assert_called_once_with(mock_db_session, chat_id, user_id)
     mock_save_user_messages.assert_called_once_with(mock_db_session, chat_id, message_request)
-    mock_build_prompt.assert_called_once_with(mock_db_session, chat_id)
-    mock_call_bot.assert_called_once_with("Prompt text")
-    mock_add_message.assert_called_once_with(mock_db_session, chat_id, "bot", dummy_bot_response.text) 
 
 
 def test_service_message_add_message_unauthorized(mock_db_session, message_request, monkeypatch):

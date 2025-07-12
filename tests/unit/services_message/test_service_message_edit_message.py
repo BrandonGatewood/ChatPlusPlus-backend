@@ -29,37 +29,25 @@ def test_service_message_edit_message_success(mock_db_session, edited_message_re
     chat_id = uuid4()
     message_id = uuid4()
 
-    dummy_bot_response = MessageResponse(
-        id=1, chat_id=chat_id, sender="bot", text="Bot responded."
-    )
-
-    # Patch dependencies with MagicMock so we can assert calls if needed
+     # Patch chat ownership to True
     mock_ownership = MagicMock(return_value=True)
     monkeypatch.setattr("app.services.services_message.chat_ownership", mock_ownership)
 
+    # Patch edit_message function
     mock_edit_message = MagicMock()
     monkeypatch.setattr("app.services.services_message.edit_message", mock_edit_message)
 
-    mock_build_prompt = MagicMock(return_value="Prompt text")
-    monkeypatch.setattr("app.services.services_message.build_prompt", mock_build_prompt)
+    # Call service
+    result = edit_text_message_service(
+        mock_db_session, user_id, chat_id, message_id, edited_message_request
+    )
 
-    mock_call_bot = MagicMock(return_value=dummy_bot_response)
-    monkeypatch.setattr("app.services.services_message.call_bot", mock_call_bot)
+    # Service returns None
+    assert result is None
 
-    mock_add_message = MagicMock()
-    monkeypatch.setattr("app.services.services_message.add_message", mock_add_message)
-
-    result = edit_text_message_service(mock_db_session, user_id, chat_id, message_id, edited_message_request)
-
-    assert isinstance(result, MessageResponse)
-    assert result.text == "Bot responded."
-
-    # Optional: verify expected calls for extra confidence
+    # Verify expected calls
     mock_ownership.assert_called_once_with(mock_db_session, chat_id, user_id)
     mock_edit_message.assert_called_once_with(mock_db_session, message_id, edited_message_request.text)
-    mock_build_prompt.assert_called_once_with(mock_db_session, chat_id)
-    mock_call_bot.assert_called_once_with("Prompt text")
-    mock_add_message.assert_called_once_with(mock_db_session, chat_id, "bot", dummy_bot_response.text)
 
 
 def test_service_message_edit_message_unauthorized(mock_db_session, edited_message_request, monkeypatch):

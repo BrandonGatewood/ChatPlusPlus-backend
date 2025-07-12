@@ -4,7 +4,8 @@ from io import BytesIO
 from unittest.mock import MagicMock
 from fastapi import UploadFile
 from app.exceptions import ChatNotFoundError, NotFoundError, UserNotFoundError
-from app.schemas.schema_message import MessageRequest, MessageResponse
+from app.schemas.schema_chat import ChatTitle
+from app.schemas.schema_message import MessageRequest
 from app.services.services_chat import create_chat_service
 
 
@@ -68,29 +69,20 @@ def message_request_multiple_files():
     )
 
 
-def patch_create_chat_dependencies(monkeypatch, dummy_chat, dummy_bot_response):
+def patch_create_chat_dependencies(monkeypatch, dummy_chat):
     """
     Helper: patch all functions called by create_chat_service using MagicMock,
     so they can be asserted later if needed.
     """
     mock_create_chat = MagicMock(return_value=dummy_chat)
     mock_save_user_messages = MagicMock()
-    mock_build_prompt = MagicMock(return_value="Prompt for bot")
-    mock_call_bot = MagicMock(return_value=dummy_bot_response)
-    mock_add_message = MagicMock()
 
     monkeypatch.setattr("app.services.services_chat.create_chat", mock_create_chat)
     monkeypatch.setattr("app.services.services_chat.save_user_messages", mock_save_user_messages)
-    monkeypatch.setattr("app.services.services_chat.build_prompt", mock_build_prompt)
-    monkeypatch.setattr("app.services.services_chat.call_bot", mock_call_bot)
-    monkeypatch.setattr("app.services.services_chat.add_message", mock_add_message)
 
     return (
         mock_create_chat,
         mock_save_user_messages,
-        mock_build_prompt,
-        mock_call_bot,
-        mock_add_message,
     )
 
 
@@ -99,26 +91,23 @@ def test_service_chat_create_chat_empty_files(mock_db_session, message_request_e
     Unit test for create_chat_service with user text and no files.
     """
     user_id = uuid4()
-    dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
+    dummy_chat = ChatTitle(id=uuid4(), title="Chat Title")
 
     # Arrange
-    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat, dummy_bot_response)
+    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat)
 
     # Act
     result = create_chat_service(mock_db_session, user_id, message_request_empty_files)
 
     # Assert: result correctness
-    assert isinstance(result, MessageResponse)
-    assert result.text == "Bot responded."
+    assert isinstance(result, ChatTitle)
+    assert result.id == dummy_chat.id
+    assert result.title == dummy_chat.title
 
     # Assert: verify calls
-    (mock_create_chat, mock_save_user_messages, mock_build_prompt, mock_call_bot, mock_add_message) = mocks
-    mock_create_chat.assert_called_once_with(mock_db_session, user_id, "Chat Title")
+    (mock_create_chat, mock_save_user_messages) = mocks
+    mock_create_chat.assert_called_once_with(mock_db_session, user_id, dummy_chat.title)
     mock_save_user_messages.assert_called_once_with(mock_db_session, dummy_chat.id, message_request_empty_files)
-    mock_build_prompt.assert_called_once_with(mock_db_session, dummy_chat.id)
-    mock_call_bot.assert_called_once_with("Prompt for bot")
-    mock_add_message.assert_called_once_with(mock_db_session, dummy_chat.id, "bot", dummy_bot_response.text)
 
 
 def test_service_chat_create_chat_one_pdf_file(mock_db_session, message_request_one_pdf_file, monkeypatch):
@@ -126,22 +115,20 @@ def test_service_chat_create_chat_one_pdf_file(mock_db_session, message_request_
     Unit test for create_chat_service with user text and one PDF file.
     """
     user_id = uuid4()
-    dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
+    dummy_chat = ChatTitle(id=uuid4(), title="Chat Title")
 
-    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat, dummy_bot_response)
+    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat)
 
     result = create_chat_service(mock_db_session, user_id, message_request_one_pdf_file)
 
-    assert isinstance(result, MessageResponse)
-    assert result.text == "Bot responded."
+    assert isinstance(result, ChatTitle)
+    assert result.id == dummy_chat.id
+    assert result.title == dummy_chat.title
 
-    (mock_create_chat, mock_save_user_messages, mock_build_prompt, mock_call_bot, mock_add_message) = mocks
-    mock_create_chat.assert_called_once_with(mock_db_session, user_id, "Chat Title")
+    (mock_create_chat, mock_save_user_messages) = mocks
+    mock_create_chat.assert_called_once_with(mock_db_session, user_id, dummy_chat.title)
     mock_save_user_messages.assert_called_once_with(mock_db_session, dummy_chat.id, message_request_one_pdf_file)
-    mock_build_prompt.assert_called_once_with(mock_db_session, dummy_chat.id)
-    mock_call_bot.assert_called_once_with("Prompt for bot")
-    mock_add_message.assert_called_once_with(mock_db_session, dummy_chat.id, "bot", dummy_bot_response.text)
+    
 
 
 def test_service_chat_create_chat_one_docx_file(mock_db_session, message_request_one_docx_file, monkeypatch):
@@ -149,22 +136,19 @@ def test_service_chat_create_chat_one_docx_file(mock_db_session, message_request
     Unit test for create_chat_service with user text and one DOCX file.
     """
     user_id = uuid4()
-    dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
+    dummy_chat = ChatTitle(id=uuid4(), title="Chat Title")
 
-    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat, dummy_bot_response)
+    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat)
 
     result = create_chat_service(mock_db_session, user_id, message_request_one_docx_file)
 
-    assert isinstance(result, MessageResponse)
-    assert result.text == "Bot responded."
+    assert isinstance(result, ChatTitle)
+    assert result.id == dummy_chat.id
+    assert result.title == dummy_chat.title
 
-    (mock_create_chat, mock_save_user_messages, mock_build_prompt, mock_call_bot, mock_add_message) = mocks
-    mock_create_chat.assert_called_once_with(mock_db_session, user_id, "Chat Title")
+    (mock_create_chat, mock_save_user_messages) = mocks
+    mock_create_chat.assert_called_once_with(mock_db_session, user_id, dummy_chat.title)
     mock_save_user_messages.assert_called_once_with(mock_db_session, dummy_chat.id, message_request_one_docx_file)
-    mock_build_prompt.assert_called_once_with(mock_db_session, dummy_chat.id)
-    mock_call_bot.assert_called_once_with("Prompt for bot")
-    mock_add_message.assert_called_once_with(mock_db_session, dummy_chat.id, "bot", dummy_bot_response.text)
 
 
 def test_service_chat_create_chat_multiple_files(mock_db_session, message_request_multiple_files, monkeypatch):
@@ -172,49 +156,20 @@ def test_service_chat_create_chat_multiple_files(mock_db_session, message_reques
     Unit test for create_chat_service with user text and multiple PDF/DOCX files.
     """
     user_id = uuid4()
-    dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
+    dummy_chat = ChatTitle(id=uuid4(), title="Chat Title")
 
-    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat, dummy_bot_response)
+    mocks = patch_create_chat_dependencies(monkeypatch, dummy_chat)
 
     result = create_chat_service(mock_db_session, user_id, message_request_multiple_files)
 
-    assert isinstance(result, MessageResponse)
-    assert result.text == "Bot responded."
+    assert isinstance(result, ChatTitle)
+    assert result.id == dummy_chat.id
+    assert result.title == dummy_chat.title
 
-    (mock_create_chat, mock_save_user_messages, mock_build_prompt, mock_call_bot, mock_add_message) = mocks
-    mock_create_chat.assert_called_once_with(mock_db_session, user_id, "Chat Title")
+    (mock_create_chat, mock_save_user_messages) = mocks
+    mock_create_chat.assert_called_once_with(mock_db_session, user_id, dummy_chat.title)
     mock_save_user_messages.assert_called_once_with(mock_db_session, dummy_chat.id, message_request_multiple_files)
-    mock_build_prompt.assert_called_once_with(mock_db_session, dummy_chat.id)
-    mock_call_bot.assert_called_once_with("Prompt for bot")
-    mock_add_message.assert_called_once_with(mock_db_session, dummy_chat.id, "bot", dummy_bot_response.text)
-
-
-def test_service_chat_create_chat_multiple_files(mock_db_session, message_request_multiple_files, monkeypatch):
-    """
-    Unit test for successful execution of create_chat_service.
-
-    User request text and multiple docx/pdf files
-    """
-    # Arrange
-    user_id = uuid4()
-    dummy_chat = MagicMock(id=1)
-    dummy_bot_response = MessageResponse(id=1, chat_id=1, sender="bot", text="Bot responded.")
-
-    # Patch the dependent functions to avoid hitting actual DB/bot
-    monkeypatch.setattr("app.services.services_chat.create_chat", lambda db, uid, title: dummy_chat)
-    monkeypatch.setattr("app.services.services_chat.save_user_messages", lambda db, chat_id, msg_in: None)
-    monkeypatch.setattr("app.services.services_chat.build_prompt", lambda db, chat_id: "Prompt for bot")
-    monkeypatch.setattr("app.services.services_chat.call_bot", lambda prompt: dummy_bot_response)
-    monkeypatch.setattr("app.services.services_chat.add_message", lambda db, chat_id, sender, text: None)
-
-    # Act
-    result = create_chat_service(mock_db_session, user_id, message_request_multiple_files)
-
-    # Assert
-    assert isinstance(result, MessageResponse)
-    assert result.text == "Bot responded."
-
+    
 
 def test_service_chat_create_chat_raise_user_not_found(mock_db_session, message_request_multiple_files, monkeypatch):
     """
