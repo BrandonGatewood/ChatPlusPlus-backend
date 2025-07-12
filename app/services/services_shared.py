@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
@@ -13,7 +14,11 @@ Shared service functions for message handling:
 """
 
 
-def save_user_messages(db: Session, chat_id: UUID, msg_in: MessageRequest) -> None:
+def save_user_messages(
+    db: Session,
+    chat_id: UUID,
+    msg_in: MessageRequest
+) -> List[MessageResponse]:
     """
     Save user text and uploaded files as messages in the DB.
 
@@ -23,31 +28,24 @@ def save_user_messages(db: Session, chat_id: UUID, msg_in: MessageRequest) -> No
         msg_in: MessageRequest object containing text and optional files.
 
     Returns:
-        None
+        The list of MessageResponse instance containing the id, sender, and text.
     """
-    add_message(db, chat_id, "user", msg_in.text)
+    message_responses = [] 
+    message_response = add_message(db, chat_id, "user", msg_in.text)
+    message_responses.append(message_response)
+
     if msg_in.files:
         for file in msg_in.files:
             parsed_text = parse_file(file)
-            add_message(db, chat_id, "user", parsed_text)
+            message_response = add_message(db, chat_id, "user", parsed_text)
+            message_responses.append(message_response)
+    
+    return message_responses
 
 
-def build_prompt(db: Session, chat_id: UUID) -> str:
-    """
-    Concatenate all messages in a chat into a single prompt string.
-
-    Args:
-        db: SQLAlchemy DB session.
-        chat_id: The chat_id's unique ID.
-
-    Returns:
-        The combined prompt string from chat messages.
-    """
-    messages = get_messages_for_chat(db, chat_id)
-    return "\n\n".join(msg.text for msg in messages)
-
-
-def parse_file(file: UploadFile) -> str:
+def parse_file(
+    file: UploadFile
+) -> str:
     """
     Parse uploaded file content to extract text for supported formats.
     Raises error for unsupported or empty files.
@@ -60,7 +58,7 @@ def parse_file(file: UploadFile) -> str:
         ExtensionsError: If the file is empty or cannot be read.
 
     Returns:
-        Extracted text content of the file.
+        The string extracted content of the file.
     """
     file_ext = file.filename.lower().split('.')[-1]
     if file_ext not in ["pdf", "docx"]:
@@ -73,16 +71,3 @@ def parse_file(file: UploadFile) -> str:
         raise ExtensionsError(f"File {file.filename} is empty or could not be read.")
 
     return parse_pdf_bytes(file_bytes) if file_ext == "pdf" else parse_docx_bytes(file_bytes)
-
-
-def call_bot(prompt: str) -> MessageResponse:
-    """
-    Stub function to simulate bot response generation.
-
-    Args:
-        prompt: The prompt string to send to the bot.
-
-    Returns:
-        MessageResponse containing the bot's text reply.
-    """
-    return MessageResponse(text="Bot responded.")
