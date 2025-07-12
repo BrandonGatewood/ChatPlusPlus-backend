@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import List
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, load_only
 from app.db.models.chat import Chat
 from app.db.models.message import Message
 from app.db.models.user import User 
@@ -21,7 +21,7 @@ def create_chat(
     db: Session,
     user_id: UUID,
     title: str
-) -> Chat:
+) -> ChatTitle:
     """
     Add a new chat for the given user.
 
@@ -34,7 +34,7 @@ def create_chat(
         UserNotFoundError: If user does not exist.
 
     Returns:
-        The newly created Chat instance.
+        The newly created ChatTitle instance containing the new id and title.
     """
     user = db.query(User).filter(User.id == user_id).one_or_none()
 
@@ -46,11 +46,15 @@ def create_chat(
     db.add(chat)
     db.commit()
     db.refresh(chat)
+    
+    return  ChatTitle(id=chat.id, title=chat.title)
+    
 
-    return chat
 
-
-def delete_chat(db: Session, chat_id: UUID) -> None:
+def delete_chat(
+    db: Session,
+    chat_id: UUID
+) -> None:
     """
     Delete the given chat.
 
@@ -73,9 +77,14 @@ def delete_chat(db: Session, chat_id: UUID) -> None:
     db.commit()
 
 
-def get_chat(db: Session, chat_id: UUID) -> Chat:
+def get_chat(
+    db: Session,
+    chat_id: UUID
+) -> Chat:
     """
-    Get the given chat.
+    Get the given chat with messages.
+    Loads only id column from Chat.
+    Joind loads id, sender, and text columns from Message.
 
     Args:
         db: SQLAlchemy DB session.
@@ -85,11 +94,14 @@ def get_chat(db: Session, chat_id: UUID) -> Chat:
         ChatNotFoundError: if chat_id does not exist.
 
     Returns:
-        The found Chat instance. 
+        The found Chat instance containing all metadata. 
     """
     chat = (
         db.query(Chat)
-        .options(joinedload(Chat.messages))
+        .options(
+            load_only(Chat.id), 
+            joinedload(Chat.messages).load_only(Message.id, Message.sender, Message.text)
+        )
         .filter(Chat.id == chat_id)
         .one_or_none()
     )
@@ -100,37 +112,44 @@ def get_chat(db: Session, chat_id: UUID) -> Chat:
     return chat
 
 
-def get_all_chat_titles(db: Session, user_id: UUID) -> List[ChatTitle]:
+def get_all_chat_titles(
+    db: Session,
+    user_id: UUID
+) -> List[ChatTitle]:
     """
     Get the title of all chats owned by user.
+    Selects id and title column from Chat. 
 
     Args:
         db: SQLAlchemy DB session.
         user_id: The unique UUID for the user.
 
     Returns:
-        The list of ChatTitle objects owned by user. 
+        The list of ChatTitle instance containing the id and title. 
     """
     chats = (
-        db.query(Chat.id, Chat.title)          # select only the columns you want
-        .filter(Chat.user_id == user_id)       # filter by the user's id
-        .order_by(Chat.created_at.desc())      # optional: newest chats first
-        .all()                                 # execute query and get list of tuples
+        db.query(Chat.id, Chat.title)          
+        .filter(Chat.user_id == user_id)       
+        .order_by(Chat.created_at.desc())      
+        .all()                                 
     )
 
     return [ChatTitle(id=chat_id, title=title) for chat_id, title in chats]
 
 
-def get_messages_for_chat(db: Session, chat_id: UUID) -> List[Message]:
+def get_messages_for_chat(
+    db: Session,
+    chat_id: UUID
+) -> List[Message]:
     """
     Fetch all messages belonging to a specific chat, ordered by creation time.
 
     Args:
-        db: SQLAlchemy DB session
+        db: SQLAlchemy DB session.
         chat_id: The unique UUID for the chat.
 
     Returns:
-        List of Message objects sorted by created_at ascending
+        The sorted List of Message instance containing all metadata of Message.
     """
     messages = (
         db.query(Message)
@@ -142,7 +161,11 @@ def get_messages_for_chat(db: Session, chat_id: UUID) -> List[Message]:
     return messages
 
 
-def chat_ownership(db: Session, chat_id: UUID, user_id: UUID) -> bool:
+def chat_ownership(
+    db: Session,
+    chat_id: UUID,
+    user_id: UUID
+) -> bool:
     """
     Check if user owns the chat.
 

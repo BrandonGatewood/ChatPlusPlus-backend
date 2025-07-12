@@ -1,8 +1,7 @@
-from datetime import datetime
 from typing import List
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
-from app.schemas.schema_message import MessageInChat
+from app.schemas.schema_message import MessageResponse
 
 
 class ChatTitle(BaseModel):
@@ -19,6 +18,5 @@ class ChatResponse(BaseModel):
     """
     id: UUID
     title: str
-    created_at: datetime
-    messages: List[MessageInChat]
+    messages: List[MessageResponse]
     model_config = ConfigDict(from_attributes=True)

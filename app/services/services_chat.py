@@ -3,10 +3,9 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from app.exceptions import AuthorizationError, UserNotFoundError, NotFoundError, ChatNotFoundError
 from app.schemas.schema_chat import ChatResponse, ChatTitle
-from app.schemas.schema_message import MessageRequest, MessageResponse
+from app.schemas.schema_message import MessageRequest
 from app.crud.crud_chat import chat_ownership, create_chat, delete_chat, get_all_chat_titles, get_chat
-from app.crud.crud_message import add_message
-from app.services.services_shared import save_user_messages, build_prompt, call_bot
+from app.services.services_shared import save_user_messages
 
 
 """
@@ -19,9 +18,9 @@ def create_chat_service(
     db: Session,
     user_id: UUID,
     message_request: MessageRequest
-) -> MessageResponse:
+) -> ChatTitle:
     """
-    Create a new chat with the user's initial message(s) and a bot response.
+    Create a new chat with the user's initial message(s).
 
     Args:
         db: SQLAlchemy DB session.
@@ -32,18 +31,15 @@ def create_chat_service(
         NotFoundError: If UserNotFoundError or ChatNotFoundError was caught.
 
     Returns:
-        The message response with the bot's response.
+        The ChatTitle instance containing the new id and title.
     """
     try:
-        chat = create_chat(db, user_id, "Chat Title")
-        save_user_messages(db, chat.id, message_request)
+        # NEED TO CALL LLM TO GENERATE TITLE!!
+        # title = generateTitile(message_request)
+        chatTitle = create_chat(db, user_id, "Chat Title")
+        message_reposonses = save_user_messages(db, chatTitle.id, message_request)
 
-        prompt = build_prompt(db, chat.id)
-        bot_response = call_bot(prompt)
-
-        add_message(db, chat.id, "bot", bot_response.text)
-
-        return bot_response
+        return chatTitle
 
     except UserNotFoundError as e:
         raise NotFoundError(f"User not found: {str(e)}")
@@ -76,11 +72,16 @@ def delete_chat_service(
             raise AuthorizationError("Not Authorized")
 
         delete_chat(db, chat_id)
+
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
 
 
-def get_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> ChatResponse:
+def get_chat_service(
+    db: Session,
+    chat_id: UUID,
+    user_id: UUID
+) -> ChatResponse:
     """
     Get the requested chat for user.
 
@@ -94,20 +95,24 @@ def get_chat_service(db: Session, chat_id: UUID, user_id: UUID) -> ChatResponse:
         NotFoundError: If ChatNotFoundError was caught.
 
     Returns:
-        The Chat object.
+        The ChatResponse instance containg all metadata of found chat.
     """
     try:
         if not chat_ownership(db, chat_id, user_id):
             raise AuthorizationError("Not Authorized")
 
         chat = get_chat(db, chat_id)
+
+        return ChatResponse.model_validate(chat) 
+
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")
-    
-    return ChatResponse.model_validate(chat) 
 
 
-def get_all_chat_titles_service(db: Session, user_id: UUID) -> List[ChatTitle]:
+def get_all_chat_titles_service(
+    db: Session,
+    user_id: UUID
+) -> List[ChatTitle]:
     """
     Get all the chats owned by user.
 
@@ -116,7 +121,8 @@ def get_all_chat_titles_service(db: Session, user_id: UUID) -> List[ChatTitle]:
         user_id: The unique UUID for the user.
 
     Returns:
-        The list of all ChatTitles objects.
+        The list of ChatTitle instance containing the id and title.
     """
     chats = get_all_chat_titles(db, user_id)
+
     return chats

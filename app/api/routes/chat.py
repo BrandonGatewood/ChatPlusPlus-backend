@@ -6,7 +6,7 @@ from app.core.auth import get_current_user
 from app.db.session import get_db
 from app.exceptions import AuthorizationError, NotFoundError
 from app.schemas.schema_chat import ChatResponse, ChatTitle
-from app.schemas.schema_message import MessageRequest, MessageResponse
+from app.schemas.schema_message import MessageRequest 
 from app.schemas.schema_user import UserId
 from app.services.services_chat import create_chat_service, delete_chat_service, get_chat_service
 from app.services.services_chat import get_all_chat_titles_service as get_chats_service
@@ -14,13 +14,13 @@ from app.services.services_chat import get_all_chat_titles_service as get_chats_
 router = APIRouter()
 
 
-@router.post("/chats/", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/chats/", response_model=ChatTitle, status_code=status.HTTP_201_CREATED)
 def create_chat_router(
     message_request: str = Form(...),
-    files_request: Optional[List[UploadFile]] = File(None),
+    files_request: Optional[List[UploadFile]] = File([]),
     db: Session = Depends(get_db),
     current_user: UserId = Depends(get_current_user)
-) -> MessageResponse: 
+) -> ChatTitle: 
     """
     Create a new chat with the user's initial message(s).
     
@@ -34,7 +34,7 @@ def create_chat_router(
         HTTPException: If NotFoundError was caught.
 
     Returns:
-        The message response with the bot's response.
+        The ChatTitle instance containing the new id and title.
     """
     try:
         return create_chat_service(db, current_user.id, MessageRequest(text=message_request, files=files_request))
@@ -83,7 +83,7 @@ def get_chats_router(
         current_user: The current authenticated user.
 
     Returns:
-        The List[ChatTitle] owned by the user.
+        The list of ChatTitle instance containing the id and title.
     """
     return get_chats_service(db, current_user.id)
 
@@ -104,7 +104,7 @@ def get_chat_router(
         HTTPException: If NotFoundError was caught.
 
     Returns:
-        The ChatResponse instance.
+        The ChatResponse instance containg all metadata of found chat.
     """
     try:
         return get_chat_service(db, chat_id, current_user.id)
