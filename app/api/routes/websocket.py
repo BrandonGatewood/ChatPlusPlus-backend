@@ -1,9 +1,7 @@
-from uuid import UUID
 import uuid
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from app.crud.crud_chat import chat_ownership
-from app.exceptions import AuthorizationError, NotFoundError
 from app.core.auth import get_current_user_ws
 from app.db.session import get_db
 from app.services.services_websocket import build_prompt_service, stream_bot_response_service
@@ -64,7 +62,7 @@ async def websocket_endpoint(
             return
 
         prompt = build_prompt_service(db, user_id.id, chat_id)
-        await stream_bot_response_service(websocket, db, message_id, prompt)
+        await stream_bot_response_service(websocket, db, chat_id, message_id, prompt)
 
     except WebSocketDisconnect:
         print("Client disconnected") 

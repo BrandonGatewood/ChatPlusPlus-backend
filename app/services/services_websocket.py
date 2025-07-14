@@ -26,6 +26,7 @@ def llm_stream_sync(prompt: str):
 async def stream_bot_response_service(
     websocket: WebSocket,
     db: Session,
+    chat_id: UUID,
     message_id: UUID,
     prompt: str
 ) -> None:
@@ -34,21 +35,23 @@ async def stream_bot_response_service(
 
     Args:
         websocket: The websocket connection.
+        db: The SQLAlchemy DB session.
+        chat_id: The unique UUID for the chat.
         message_id: The unique UUID for the message.
         prompt: the prompt to send the bot.
 
     Closes:
         Code=1000: Streaming complete.
-        Code=1008: Message not found.
+        Code=1008: Message not found or unauthorized.
 
     Returns:
         None.
     """
     message = get_message(db, message_id)
 
-    if not message:
+    if not message or message.chat_id != chat_id:
         print("no message obj")
-        await websocket.close(code=1008, reason="Message not found.")
+        await websocket.close(code=1008, reason="Message not found or unauthorized.")
         return
 
     for chunk in llm_stream_sync(prompt):
