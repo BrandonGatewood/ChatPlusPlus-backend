@@ -5,6 +5,7 @@ from app.db.session import engine
 from app.api.routes import auth 
 from app.api.routes import chat
 from app.api.routes import message
+from app.api.routes import websocket
 
 from dotenv import load_dotenv
 import os
@@ -29,3 +30,4 @@ app.add_middleware(
 app.include_router(auth.router, tags=["auth"])
 app.include_router(chat.router, tags=["chat"])
 app.include_router(message.router, tags=["message"])
+app.include_router(websocket.router, tags=["websocket"])
