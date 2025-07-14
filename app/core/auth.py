@@ -68,7 +68,10 @@ async def get_current_user_ws(
         db: SQLAlchemy DB session.
 
     Raises:
-        .Close: If Jason Web Token is invalid or user not found.
+        Code=1008: Unauthorized: No token.
+        Code=1008: Unauthorized: No user id str.
+        Code=1008: Unauthorized: Cant decode jwt.
+        Code=1008: Unauthorized: No user found.
     
     Returns:
         The UserId instance containing id UUID.
@@ -85,16 +88,16 @@ async def get_current_user_ws(
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id_str = payload.get("sub")
         if not user_id_str:
-            await websocket.close(code=1008, reason="Unauthorized: no user id str")
+            await websocket.close(code=1008, reason="Unauthorized: No user id str")
             return None
         user_id = uuid.UUID(user_id_str)
     except Exception:
-        await websocket.close(code=1008, reason="Unauthorized: cant decode jwt")
+        await websocket.close(code=1008, reason="Unauthorized: Cant decode jwt")
         return None
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        await websocket.close(code=1008, reason="Unaothorized: User not found")
+        await websocket.close(code=1008, reason="Unauthorized: User not found")
         return None
 
     return UserId(id=user_id)
