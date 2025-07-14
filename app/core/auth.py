@@ -64,7 +64,7 @@ async def get_current_user_ws(
     extract the user's id from the Jason Web Token sent over a WebSocket connection.
 
     Args:
-        websocket: The Websocket.
+        websocket: The Websocket connection.
         db: SQLAlchemy DB session.
 
     Raises:
