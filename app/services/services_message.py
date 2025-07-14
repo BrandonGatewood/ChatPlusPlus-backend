@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.exceptions import AuthorizationError, NotFoundError, MessageNotFoundError, ChatNotFoundError
 from app.schemas.schema_message import MessageRequest, EditMessageRequest, MessageResponse
 from app.crud.crud_chat import chat_ownership
-from app.crud.crud_message import edit_message
+from app.crud.crud_message import add_bot_message, edit_message
 from app.services.services_shared import save_user_messages
 
 
@@ -80,5 +80,35 @@ def edit_text_message_service(
 
     except MessageNotFoundError as e:
         raise NotFoundError(f"Message not found: {str(e)}")
+    except ChatNotFoundError as e:
+        raise NotFoundError(f"Chat not found: {str(e)}")
+
+
+def add_bot_message_service(
+    db: Session,
+    user_id: UUID,
+    chat_id: UUID,
+) -> MessageResponse:
+    """
+    Add an initial message for bot to the chat.
+
+    Args:
+        db: SQLAlchemy DB session.
+        user_id: The unique UUID for the user.
+        chat_id: The unique UUID for the chat.
+
+    Raises:
+        AuthorizationError: If user doesnt own chat.
+        NotFoundError: If ChatNotFoundError was caught.
+
+    Returns:
+        The MessageResponse instance containing the id, sender, and text.
+    """
+    try:
+        if not chat_ownership(db, chat_id, user_id):
+            raise AuthorizationError("Not Authorized")
+
+        return add_bot_message(db, chat_id)
+
     except ChatNotFoundError as e:
         raise NotFoundError(f"Chat not found: {str(e)}")

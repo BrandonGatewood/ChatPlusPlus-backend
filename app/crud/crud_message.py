@@ -99,3 +99,80 @@ def _delete_messages_after_edit(
         Message.chat_id == chat_id,
         Message.created_at > edited_message_created_at
     ).delete(synchronize_session=False)
+
+
+def add_bot_message(
+    db: Session,
+    chat_id: UUID,
+) -> MessageResponse:
+    """
+    adds an initial empty message from bot to the chat. 
+
+    Args:
+        db: SQLAlchemy DB session.
+        chat_id: The unique UUID for the chat.
+        sender: The sender of message.
+        text: the sender's message text.
+
+    Raises:
+        ChatNotFoundError: If chat does not exist.
+
+    Returns:
+        The MessageResponse instance containing the id, sender, and text.
+    """
+    chat = db.query(Chat).filter(Chat.id == chat_id).one_or_none()
+    if not chat:
+        raise ChatNotFoundError(f"Chat with id {chat_id} not found.")
+    
+    message = Message(chat_id=chat_id, sender="bot", text="")
+    
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+
+    return MessageResponse.model_validate(message)
+
+
+def update_bot_message_text(
+    db: Session,
+    message: Message,
+    chunk: str
+) -> None:
+    """
+    Updates bots message to the chat. 
+
+    Args:
+        db: SQLAlchemy DB session.
+        message: The bots Message instance.
+        chunk: chunk of the bots message
+
+    Raises:
+        None.
+
+    Returns:
+        None.
+    """
+    
+    message.text += chunk 
+
+    db.commit()
+
+
+def get_message(
+    db: Session,
+    message_id: UUID,
+) -> Message:
+    """
+    Gets the message by id. 
+
+    Args:
+        db: SQLAlchemy DB session.
+        message_id: The unique UUID for the chat.
+
+    Raises:
+        None.
+
+    Returns:
+        The Message instance.
+    """
+    return db.query(Message).filter(Message.id == message_id).one_or_none()

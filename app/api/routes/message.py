@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, status, Form, Uploa
 from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
 from app.db.session import get_db
-from app.services.services_message import add_message_service, edit_text_message_service
+from app.services.services_message import add_bot_message_service, add_message_service, edit_text_message_service
 from app.schemas.schema_message import EditMessageRequest, MessageRequest, MessageResponse
 from app.schemas.schema_user import UserId
 from app.exceptions import AuthorizationError, NotFoundError
@@ -74,3 +74,31 @@ def edit_text_message_router(
         raise HTTPException(status_code=401, detail=str(e))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("/bot/{chat_id}", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+def add_bot_message_router(
+    chat_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: UserId  = Depends(get_current_user),
+) -> MessageResponse:
+    """
+    Add an initial message for bot to the chat.
+
+    Args:
+        chat_id: The unique UUID for the chat.
+        db: SQLAlchemy DB session.
+        current_user: The current authenticated user.
+
+    Raises:
+        HTTPException: If AuthorizationError or NotFoundError was caught.
+
+    Returns:
+        The MessageResponse instance containing the id, sender, and text.
+    """
+    try:
+        return add_bot_message_service(db, current_user.id, chat_id)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) 
