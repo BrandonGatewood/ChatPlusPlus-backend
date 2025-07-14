@@ -101,12 +101,14 @@ def get_chat_router(
         current_user: The current authenticated user.
 
     Raises:
-        HTTPException: If NotFoundError was caught.
+        HTTPException: If NotFoundError or AuthorizationError was caught.
 
     Returns:
         The ChatResponse instance containg all metadata of found chat.
     """
     try:
         return get_chat_service(db, chat_id, current_user.id)
+    except AuthorizationError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
