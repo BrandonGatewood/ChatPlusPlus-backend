@@ -25,6 +25,7 @@ async def websocket_endpoint(
         Code=1008: Invalid chat id.
         Code=1008: Invalid message id query.
         Code=1008: Invalid message id.
+        Code=1008: Not authorized.
 
     Returns:
         None.
@@ -45,7 +46,7 @@ async def websocket_endpoint(
         
         message_id_str = websocket.query_params.get("message_id")
         if not message_id_str:
-            await websocket.close(code=1008, reason="Invalid message id query.")  # Policy Violation
+            await websocket.close(code=1008, reason="Invalid message id query.")
             return
         try:
             message_id = uuid.UUID(message_id_str)
@@ -57,7 +58,7 @@ async def websocket_endpoint(
 
         user_id = await get_current_user_ws(websocket, db)
 
-        if not chat_ownership(db, chat_id, user_id):
+        if not chat_ownership(db, chat_id, user_id.id):
             await websocket.close(code=1008, reason="Not Authorized.")
             return
 
