@@ -6,22 +6,25 @@ from uuid import UUID
 from app.crud.crud_message import get_message
 from app.crud.crud_message import update_bot_message_text
 from app.services.services_chat import get_chat_service
+from groq import Groq
 
+client = Groq()
 
 """
 Service operations for websocket connection.
 
 Includes streaming llm response and building prompt to send to the llm.
 """
-
-
 def llm_stream_sync(prompt: str):
-    # yields chunks synchronously
-    yield "Hello, "
-    yield "this is "
-    yield "a streamed "
-    yield "response!"
-
+    response = client.chat.completions.create(
+        model="qwen/qwen3-32b",
+        messages=[{"role": "user", "content": prompt}],
+        stream=True,
+        reasoning_format= "hidden",
+    )
+    for chunk in response:
+        yield chunk.choices[0].delta.content or ""
+        
 
 async def stream_bot_response_service(
     websocket: WebSocket,
@@ -61,7 +64,6 @@ async def stream_bot_response_service(
         # Step 2: Update DB incrementally
         update_bot_message_text(db, message, chunk)
 
-        await asyncio.sleep(0.5)
     await websocket.close(code=1000, reason="Streaming complete.")
 
 
