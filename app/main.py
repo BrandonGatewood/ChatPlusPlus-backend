@@ -20,7 +20,7 @@ Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[url],  # React dev server
+    allow_origins=[url], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
