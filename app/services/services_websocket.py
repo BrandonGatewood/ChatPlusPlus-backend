@@ -1,5 +1,5 @@
-import asyncio
 import json
+from typing import Generator
 from fastapi import WebSocket
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -15,7 +15,20 @@ Service operations for websocket connection.
 
 Includes streaming llm response and building prompt to send to the llm.
 """
-def llm_stream_sync(prompt: str):
+
+
+def llm_stream_sync(
+    prompt: str
+) -> Generator[str, None, None]:
+    """
+    streams the bots response using qwen3-32b model. 
+
+    Args:
+        prompt: the prompt to send the model.
+
+    Returns:
+        None.
+    """
     response = client.chat.completions.create(
         model="qwen/qwen3-32b",
         messages=[{"role": "user", "content": prompt}],
@@ -34,7 +47,9 @@ async def stream_bot_response_service(
     prompt: str
 ) -> None:
     """
-    stream the bots response. 
+    stream the bots response service. 
+    Validates message, sends llm response in chunks via websockets,
+    and updates the message with the llm response chunk to the db.
 
     Args:
         websocket: The websocket connection.

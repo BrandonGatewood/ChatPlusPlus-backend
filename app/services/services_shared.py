@@ -4,7 +4,6 @@ from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from app.exceptions import ExtensionsError
 from app.crud.crud_message import add_message
-from app.crud.crud_chat import get_messages_for_chat
 from app.utils.parsers import parse_pdf_bytes, parse_docx_bytes
 from app.schemas.schema_message import MessageRequest, MessageResponse
 
