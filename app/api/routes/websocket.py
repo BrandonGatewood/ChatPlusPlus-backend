@@ -54,8 +54,6 @@ async def websocket_endpoint(
             await websocket.close(code=1008, reason="Invalid message id.")
             return
 
-
-
         user_id = await get_current_user_ws(websocket, db)
 
         if not chat_ownership(db, chat_id, user_id.id):
