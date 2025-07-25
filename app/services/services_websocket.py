@@ -1,14 +1,11 @@
 import json
-from typing import Generator
 from fastapi import WebSocket
 from sqlalchemy.orm import Session
 from uuid import UUID
 from app.crud.crud_message import get_message
 from app.crud.crud_message import update_bot_message_text
 from app.services.services_chat import get_chat_service
-from groq import Groq
-
-client = Groq()
+from app.services.services_llm import generate_response 
 
 """
 Service operations for websocket connection.
@@ -16,28 +13,6 @@ Service operations for websocket connection.
 Includes streaming llm response and building prompt to send to the llm.
 """
 
-
-def llm_stream_sync(
-    prompt: str
-) -> Generator[str, None, None]:
-    """
-    streams the bots response using qwen3-32b model. 
-
-    Args:
-        prompt: the prompt to send the model.
-
-    Returns:
-        None.
-    """
-    response = client.chat.completions.create(
-        model="qwen/qwen3-32b",
-        messages=[{"role": "user", "content": prompt}],
-        stream=True,
-        reasoning_format= "hidden",
-    )
-    for chunk in response:
-        yield chunk.choices[0].delta.content or ""
-        
 
 async def stream_bot_response_service(
     websocket: WebSocket,
@@ -72,7 +47,7 @@ async def stream_bot_response_service(
         await websocket.close(code=1008, reason="Message not found or unauthorized.")
         return
 
-    for chunk in llm_stream_sync(prompt):
+    for chunk in generate_response(prompt):
         msg = {"id": str(message_id), "sender": "bot", "text": chunk}
         await websocket.send_text(json.dumps(msg))
 
