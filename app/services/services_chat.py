@@ -6,6 +6,7 @@ from app.schemas.schema_chat import ChatResponse, ChatTitle
 from app.schemas.schema_message import MessageRequest
 from app.crud.crud_chat import chat_ownership, create_chat, delete_chat, get_all_chat_titles, get_chat
 from app.services.services_shared import save_user_messages
+from app.services.services_llm import generate_title
 
 
 """
@@ -34,9 +35,8 @@ def create_chat_service(
         The ChatTitle instance containing the new id and title.
     """
     try:
-        # NEED TO CALL LLM TO GENERATE TITLE!!
-        # title = generateTitile(message_request)
-        chatTitle = create_chat(db, user_id, "Chat Title")
+        title = generate_title(message_request.text)
+        chatTitle = create_chat(db, user_id, title)
         message_reposonses = save_user_messages(db, chatTitle.id, message_request)
 
         return chatTitle
