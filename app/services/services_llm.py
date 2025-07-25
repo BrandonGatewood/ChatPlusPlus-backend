@@ -1,6 +1,13 @@
 from typing import Generator
 from groq import Groq  
 
+"""
+Service operations for the large language model.
+
+Includes generating and streaming a response, and generating a title for a new chat.
+"""
+
+
 client = Groq()
 
 def generate_title(
