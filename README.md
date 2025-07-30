@@ -5,8 +5,8 @@ Manages user registration, login, and chat sessions via HTTP. Supports real-time
 
 ## Live Demo
 
-- Backend: [https://chatplusplus-backend.onrender.com](https://chatplusplus-backend.onrender.com)  
-- Swagger UI: [https://chatplusplus-backend.onrender.com/docs](https://chatplusplus-backend.onrender.com/docs)
+- Backend: [chatplusplus-backend.onrender.com](https://chatplusplus-backend.onrender.com)  
+- Swagger UI: [chatplusplus-backend.onrender.com/docs](https://chatplusplus-backend.onrender.com/docs)
 - GitHub Repo: [github.com/BrandonGatewood/ChatPlusPlus-backend](https://github.com/BrandonGatewood/ChatPlusPlus-backend)
 
 ---
