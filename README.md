@@ -3,7 +3,7 @@
 A lightweight clone of ChatGPT’s backend capabilities built with FastAPI and PostgreSQL.  
 Manages user registration, login, and chat sessions via HTTP. Supports real-time large language model responses through WebSockets. Also allows PDF and DOCX uploads for enhanced interactions.
 
-## 🔗 Live Demo
+## Live Demo
 
 - Backend: [https://chatplusplus-backend.onrender.com](https://chatplusplus-backend.onrender.com)  
 - Swagger UI: [https://chatplusplus-backend.onrender.com/docs](https://chatplusplus-backend.onrender.com/docs)
@@ -107,7 +107,7 @@ Business logic is tested using `pytest`. To run tests:
 
 ---
 
-## 🧩 Key Modules
+## Key Modules
 
 > A quick look at the core modules in this project:
 
@@ -148,5 +148,5 @@ It's designed to reflect real-world backend engineering practices and prepare fo
 
 ---
 
-## 📄 License
+## License
 This project is licensed under the MIT License.
