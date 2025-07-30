@@ -18,7 +18,7 @@ Manages user registration, login, and chat sessions via HTTP. Supports real-time
 - Chat and message CRUD operations  
 - Real-time LLM responses via WebSockets  
 - PDF and DOCX file uploads  
-- Integration with LLM API service 
+- Integration with Groq’s LLM API (swappable with other providers) 
 - Well-documented API endpoints with Swagger UI  
 
 ---
@@ -28,7 +28,7 @@ Manages user registration, login, and chat sessions via HTTP. Supports real-time
 - **Backend Framework:** FastAPI  
 - **Database:** PostgreSQL  
 - **Authentication:** JSON Web Tokens (JWT)  
-- **LLM Service:** LLM API service (Groq)
+- **LLM Service:** Groq API
 - **Hosting:** Render (https://chatplusplus-backend.onrender.com)
 - **Testing:** Pytest
 
@@ -37,10 +37,10 @@ Manages user registration, login, and chat sessions via HTTP. Supports real-time
 - **FastAPI** handles HTTP endpoints, WebSocket streaming, and API docs  
 - **PostgreSQL** stores users, chats, and messages
 - **JWT Auth** secures protected routes  
-- **LLM API service** processes LLM prompts and returns streamed completions  
+- **LLM API service** LLM service handles prompt streaming via Groq API 
 - **File Parser** extracts text from PDF/DOCX uploads  
 - **Render** hosts the live backend
-- **Pytest** Tests business logic
+- **Pytest** Business logic tested with Pytest
 
 ---
 
@@ -114,7 +114,7 @@ Business logic is tested using `pytest`. To run tests:
 - `app/main.py` – FastAPI entry point
 - `app/crud/crud_auth.py` - Database operations for user registration and login
 - `app/crud/crud_chat.py` - Database operations for chats
-- `app/crud/crud_message/` - Database operations for messages
+- `app/crud/crud_message.py` - Database operations for messages
 - `app/services/services_auth.py` - Authentication business logic
 - `app/services/services_chat.py` - Chat-related business logic  
 - `app/services/services_llm.py` - Large Language Model interaction logic
@@ -125,7 +125,7 @@ Business logic is tested using `pytest`. To run tests:
 - `app/routes/chat.py` – API endpoints for managing chat sessions
 - `app/routes/message.py` – API endpoints for message handling
 - `app/routes/websocket.py` – WebSocket endpoint for streaming LLM responses via Groq
-- `app/core/` - JWT authentication
+- `app/core/` - JWT encoding/decoding and auth helpers
 - `app/db/` - Database models and session management
 - `app/schemas/` – Pydantic models used for request and response validation
 - `app/util/parsers.py` – Utilities for extracting text from PDF and DOCX uploads
@@ -138,7 +138,7 @@ Business logic is tested using `pytest`. To run tests:
 
 This project was built independently as a way to:
 
-- Explore backend integration with large language models using API keys
+- Explore backend integration with large language models (currently Groq)
 - Understand and replicate core chat application mechanics, inspired by ChatGPT
 - Build a fully real-time API leveraging FastAPI and WebSockets
 - Implement clean authentication flows with well-structured, maintainable code
